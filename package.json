@@ -1,0 +1,36 @@
+{
+  "name": "raappid",
+  "description": "Complete application development tool",
+  "version": "0.0.1",
+  "author": {
+    "name": "\"coolchem\" Varun Reddy Nalagatla"
+  },
+  "homepage": "http://raappid.com/",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/coolchem/raappid.git"
+  },
+  "bugs": {
+    "url": "https://github.com/coolchem/raappid/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/coolchem/raappid/blob/master/LICENSE"
+    }
+  ],
+
+  "engines": {
+    "node": ">= 4.1.2"
+  },
+  "keywords": [
+    "development"
+  ],
+  "dependencies": {
+  },
+  "devDependencies": {
+  },
+  "readmeFilename": "README.md",
+  "_id": "raappid@0.0.1",
+  "_from": "raappid@~0.0.1"
+}
