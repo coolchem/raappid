@@ -4,11 +4,10 @@ node_js:
   - "5.0.0"
   - "4.0.0"
 install:
-    - npm install --global gulp
     - npm install -g tsd
     - tsd install
     - npm install
 after_script:
-  - npm run coveralls
+  - npm run coverage
 git:
   depth: 10

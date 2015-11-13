@@ -7,3 +7,5 @@ bower_components
 build/reports
 index.js
 lib/**/*.js
+npm-debug.log
+typings
