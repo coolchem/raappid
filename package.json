@@ -29,7 +29,13 @@
     "minimist": "^1.2.0"
   },
   "devDependencies": {
-    "minimist": "^1.2.0"
+    "chai": "^3.4.0",
+    "coveralls": "^2.11.4",
+    "del": "^2.0.2",
+    "gulp": "^3.9.0",
+    "istanbul": "^0.4.0",
+    "mocha": "^2.3.3",
+    "typescript": "^1.6.2"
   },
   "bin": {
     "raappid": "dist/bin/raappid.js"
@@ -38,7 +44,10 @@
     "dist"
   ],
   "scripts": {
+    "install":"node scripts/install.js",
+    "clean":"node scripts/clean.js",
     "build": "node scripts/build.js",
+    "build-release": "npm run build release",
     "test": " node scripts/test.js",
     "coverage": "node scripts/coverage.js",
     "release": "node scripts/release.js",
