@@ -11,9 +11,8 @@ export class BaseConfig{
     private _actionControl:IActionControl;
     private _httpControl:IHTTPControl;
 
-    constructor(actionControl:IActionControl, httpControl:IHTTPControl) {
+    constructor(actionControl:IActionControl) {
         this._actionControl = actionControl;
-        this._httpControl = httpControl;
     }
 
 
@@ -27,8 +26,9 @@ export class BaseConfig{
 }
 
 
-export function configure():void
+export function configure():BaseConfig
 {
 
-    var ac:ActionControl = new ActionControl()
+    var ac:ActionControl = new ActionControl();
+    return new BaseConfig(ac);
 }
