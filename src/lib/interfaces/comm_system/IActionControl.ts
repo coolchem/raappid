@@ -2,7 +2,7 @@
 export interface IActionControl
 {
     registerAction(actionName:string,handler:Function):void;
-    takeAction(actionName:string, params:Array<any>):Promise;
+    takeAction(actionName:string, params:Array<any>):Promise<any>;
     unregisterAction(actionName:string,handler:Function):void;
 
     publish(eventName:string, data?:any):void;

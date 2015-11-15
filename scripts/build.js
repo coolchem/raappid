@@ -20,8 +20,6 @@ else //do dev build
 
 function build(isRelease,watch){
 
-    execSync("npm run clean");
-
     var cmd = "node_modules/.bin/tsc";
 
     if(isRelease)
@@ -29,7 +27,7 @@ function build(isRelease,watch){
 
     exec(cmd, function (err, stdout, stderr) {
         console.log(stdout);
-        console.log(stderr);
+
         if(err)
         {
             process.exit(1);

@@ -61,7 +61,7 @@ export class ActionControl implements IActionControl
 
     }
 
-    takeAction(actionName:any, params:Array<any>):Promise {
+    takeAction(actionName:any, params:Array<any>):Promise<any> {
 
         if(!ActionControl.isValidActionOrEventName(actionName))
             ActionControl.throwError(ActionControl.ERROR_TAKING_ACTION_ACTION_NAME_NOT_TYPE_STRING);
