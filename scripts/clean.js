@@ -2,9 +2,9 @@
 
 var del = require('del');
 
-del(['src/**/*.js','test/**/*.js','dist','**/*.map','!node_modules/**/*.map'], function(paths){
+var paths = del.sync(['src/**/*.js','test/**/*.js','dist','**/*.map','!node_modules/**/*.map']);
 
-    console.log('Deleted files/folders:\n', paths.join('\n'));
-});
+
+console.log('Deleted files/folders:\n', paths.join('\n'));
 
 
