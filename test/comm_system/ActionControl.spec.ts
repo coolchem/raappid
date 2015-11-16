@@ -155,11 +155,11 @@ describe('ActionControl', function() {
         });
     });
 
-    describe("takeAction",()=>{
+    describe("call",()=>{
         it('should throw an error when taking action name not of type string', function(done) {
 
             throws = function() {
-                actionControl.takeAction({});
+                actionControl.call({});
             };
             expect(throws).to.throw(ActionControl.ERROR_TAKING_ACTION_ACTION_NAME_NOT_TYPE_STRING);
             done();
@@ -168,7 +168,7 @@ describe('ActionControl', function() {
         it('should throw an error when no handler found for the action', function(done) {
 
             throws = function() {
-                actionControl.takeAction("action");
+                actionControl.call("action");
             };
             expect(throws).to.throw(ActionControl.ERROR_TAKING_ACTION_NO_HANDLER_REGISTERED);
             done();
@@ -182,7 +182,7 @@ describe('ActionControl', function() {
 
             actionControl.registerAction("action",handler);
 
-            actionControl.takeAction("action");
+            actionControl.call("action");
         });
 
         it('should successfully call handler associated with the action, with appropriate parameters', function(done) {
@@ -199,7 +199,7 @@ describe('ActionControl', function() {
 
             actionControl.registerAction("action",handler);
 
-            actionControl.takeAction("action",[paramA,paramB]);
+            actionControl.call("action",[paramA,paramB]);
 
         });
 
@@ -210,7 +210,7 @@ describe('ActionControl', function() {
             };
             actionControl.registerAction("action",handler);
 
-            var result = actionControl.takeAction("action", ["humm"]);
+            var result = actionControl.call("action", ["humm"]);
 
             expect(result).to.be.instanceof(Promise);
             done();
@@ -223,7 +223,7 @@ describe('ActionControl', function() {
             };
             actionControl.registerAction("action",handler);
 
-            var result = actionControl.takeAction("action", ["humm"]);
+            var result = actionControl.call("action", ["humm"]);
 
             expect(result).to.be.instanceof(Promise);
             done();
@@ -425,47 +425,6 @@ describe('ActionControl', function() {
 
             var handlers = actionControl.eventStream.handlers["event"];
             expect(handlers.length).to.equal(1);
-
-            done();
-        });
-    });
-
-    describe("unSubscribeAll",()=>{
-        it('should throw an error when trying to unsubscribe all handlers from an event not of type string', function(done) {
-            throws = function() {
-                actionControl.unSubscribeAll({});
-            };
-            expect(throws).to.throw(ActionControl.ERROR_UNSUBSCRIBING_EVENT_NAME_NOT_TYPE_STRING);
-
-            throws = function() {
-                actionControl.unSubscribeAll();
-            };
-            expect(throws).to.throw(ActionControl.ERROR_UNSUBSCRIBING_EVENT_NAME_NOT_TYPE_STRING);
-
-            throws = function() {
-                actionControl.unSubscribeAll(null);
-            };
-            expect(throws).to.throw(ActionControl.ERROR_UNSUBSCRIBING_EVENT_NAME_NOT_TYPE_STRING);
-
-            done();
-        });
-
-        it('should allow to unsubscribe all handlers for an event', function(done) {
-
-            var handler1 = function(data){
-            };
-
-            var handler2 = function(data){
-            };
-
-            actionControl.subscribe("event", handler1);
-            actionControl.subscribe("event", handler2);
-
-            expect(actionControl.hasSubscribers("event")).to.be.true;
-
-            actionControl.unSubscribeAll("event");
-
-            expect(actionControl.hasSubscribers("event")).to.be.false;
 
             done();
         });

@@ -61,7 +61,7 @@ export class ActionControl implements IActionControl
 
     }
 
-    takeAction(actionName:any, params:Array<any>):Promise<any> {
+    call(actionName:any, params:Array<any>):Promise<any> {
 
         if(!ActionControl.isValidActionOrEventName(actionName))
             ActionControl.throwError(ActionControl.ERROR_TAKING_ACTION_ACTION_NAME_NOT_TYPE_STRING);
@@ -125,15 +125,6 @@ export class ActionControl implements IActionControl
             ActionControl.throwError(ActionControl.ERROR_UNSUBSCRIBING_HANDLER_NOT_TYPE_FUNCTION);
 
         this.eventStream.unSubscribe(eventName,callback);
-
-    }
-
-    unSubscribeAll(eventName:string):void {
-
-        if(!ActionControl.isValidActionOrEventName(eventName))
-            ActionControl.throwError(ActionControl.ERROR_UNSUBSCRIBING_EVENT_NAME_NOT_TYPE_STRING);
-
-        this.eventStream.unSubscribeAll(eventName);
 
     }
 

@@ -1,3 +1,10 @@
-/**
- * Created by varunreddy on 11/14/15.
- */
+
+
+import {Service} from "./Service";
+export class ProjectService extends Service
+{
+
+    registerActions():void {
+
+    }
+}
