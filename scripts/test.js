@@ -1,9 +1,16 @@
 
-var exec = require('child_process').exec;
+var util = require('./util');
 
-exec("istanbul cover _mocha test/**/*.js --recursive", function(err, stdOut, stdErr){
-    console.log(stdOut);
-    console.log(stdErr);
+
+util.series(["npm run build","istanbul cover _mocha test/**/*.js --recursive"], function(err){
+
+    if(err)
+    {
+        console.log(err);
+        process.exit(1);
+    }
+
+    process.exit(0);
 });
 
 

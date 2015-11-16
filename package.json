@@ -35,6 +35,7 @@
     "gulp": "^3.9.0",
     "istanbul": "^0.4.0",
     "mocha": "^2.3.3",
+    "tsd": "^0.6.5",
     "typescript": "^1.6.2"
   },
   "bin": {
@@ -44,21 +45,13 @@
     "dist"
   ],
   "scripts": {
-    "install":"node scripts/install.js",
-    "clean":"node scripts/clean.js",
-
-    "prebuild":"npm run clean",
+    "install-deps": "node scripts/install.js",
+    "clean": "node scripts/clean.js",
     "build": "node scripts/build.js",
     "build-release": "npm run build release",
-
-    "pretest": "npm run build",
     "test": "node scripts/test.js",
-
     "coverage": "node scripts/coverage.js",
-
-    "prerelease":"npm run test && npm run build-release",
     "release": "node scripts/release.js",
-
     "deploy": "node scripts/deploy.js"
   }
 }

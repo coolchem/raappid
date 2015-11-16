@@ -1,6 +1,5 @@
 
-var exec = require('child_process').exec;
-var execSync = require('child_process').execSync;
+var util = require('./util');
 var argv = require('minimist')(process.argv.slice(2));
 
 
@@ -25,11 +24,11 @@ function build(isRelease,watch){
     if(isRelease)
         cmd = cmd + " -p src --outDir dist";
 
-    exec(cmd, function (err, stdout, stderr) {
-        console.log(stdout);
+    util.series(["npm run clean",cmd], function (err) {
 
         if(err)
         {
+            console.log(err);
             process.exit(1);
         }
 

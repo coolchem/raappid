@@ -1,3 +1,2 @@
 
-var spawn = require('child_process').spawn;
-var argv = process.argv;
+var util = require('./util');
