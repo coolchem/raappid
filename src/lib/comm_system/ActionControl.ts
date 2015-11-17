@@ -2,6 +2,7 @@
 import {IActionControl} from "../interfaces/comm_system/IActionControl"
 import {IEventStream} from "../interfaces/comm_system/IEventStream"
 import {EventStream} from "./EventStream"
+import {HandlerObject} from "./HandlerObject";
 
 export class ActionControl implements IActionControl
 {
@@ -40,7 +41,17 @@ export class ActionControl implements IActionControl
             this.eventStream = new EventStream();
     }
 
-    registerAction(actionName:string, handler:Function):void {
+    protected getHandler(actionName:string):HandlerObject
+    {
+        var handlerObject:HandlerObject = this.actionHandlers[actionName];
+        if(handlerObject)
+        {
+            return handlerObject
+        }
+        return null;
+    }
+
+    registerAction(actionName:string, handler:Function,context?:any):void {
 
         if(!ActionControl.isValidActionOrEventName(actionName))
             ActionControl.throwError(ActionControl.ERROR_REGISTERING_ACTION_NAME_NOT_TYPE_STRING);
@@ -51,27 +62,27 @@ export class ActionControl implements IActionControl
         if(typeof handler !== 'function')
             ActionControl.throwError(ActionControl.ERROR_REGISTERING_ACTION_HANDLER_NOT_TYPE_FUNCTION);
 
-        let handler1:Function = this.actionHandlers[actionName];
+        let handler1:HandlerObject = this.getHandler(actionName);
 
         if(handler1)
             ActionControl.throwError(ActionControl.ERROR_REGISTERING_ACTION_ONLY_ONE_HANDLER_ALLOWED);
         else
-            this.actionHandlers[actionName] = handler
+            this.actionHandlers[actionName] = new HandlerObject(handler,context);
 
 
     }
 
-    call(actionName:any, params:Array<any>):Promise<any> {
+    perform(actionName:any, ...argArray: any[]):Promise<any> {
 
         if(!ActionControl.isValidActionOrEventName(actionName))
             ActionControl.throwError(ActionControl.ERROR_TAKING_ACTION_ACTION_NAME_NOT_TYPE_STRING);
 
-        let handler1:Function = this.actionHandlers[actionName];
+        let handler1:HandlerObject = this.getHandler(actionName);
 
         if(!handler1)
             ActionControl.throwError(ActionControl.ERROR_TAKING_ACTION_NO_HANDLER_REGISTERED);
 
-        return Promise.resolve(handler1.apply(handler1,params));
+        return Promise.resolve(handler1.handler.call(handler1.context,...argArray));
     }
 
 
@@ -97,7 +108,7 @@ export class ActionControl implements IActionControl
 
     }
 
-    subscribe(eventName:string, callback:(p1:any)=>any):void {
+    subscribe(eventName:string, callback:(p1:any)=>any,context?:any):void {
 
         if(!ActionControl.isValidActionOrEventName(eventName))
             ActionControl.throwError(ActionControl.ERROR_SUBSCRIBING_EVENT_NAME_NOT_TYPE_STRING);
@@ -108,7 +119,7 @@ export class ActionControl implements IActionControl
         if(typeof callback !== 'function')
             ActionControl.throwError(ActionControl.ERROR_SUBSCRIBING_HANDLER_NOT_TYPE_FUNCTION);
 
-        this.eventStream.subscribe(eventName,callback);
+        this.eventStream.subscribe(eventName,callback,context);
 
     }
 

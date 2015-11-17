@@ -1,5 +1,6 @@
 
 import {IEventStream} from '../interfaces/comm_system/IEventStream'
+import {HandlerObject} from "./HandlerObject";
 
 export class EventStream implements IEventStream
 {
@@ -21,19 +22,24 @@ export class EventStream implements IEventStream
         if(!EventStream.isValidEventName(eventName))
             EventStream.throwError(EventStream.ERROR_PUBLISHING_EVENT_NAME_NOT_TYPE_STRING);
 
-        let handlers:Array<Function>;
+        let handlers:Array<HandlerObject>;
 
-        handlers = this.handlers[eventName];
+        handlers = this.getHandlers(eventName);
 
-        for(var i=0; i< handlers.length; i++)
+        if(handlers)
         {
-            var callBack:Function = handlers[i];
-            callBack(data);
+            for(var i=0; i< handlers.length; i++)
+            {
+                var handler:HandlerObject = handlers[i];
+
+                handler.handler.call(handler.context,data);
+            }
+
         }
 
     }
 
-    subscribe(eventName:string, callback:(p1:any)=>any):void {
+    subscribe(eventName:string, callback:(p1:any)=>any,context?:any):void {
 
         if(!EventStream.isValidEventName(eventName))
            EventStream.throwError(EventStream.ERROR_SUBSCRIBING_EVENT_NAME_NOT_TYPE_STRING);
@@ -45,7 +51,7 @@ export class EventStream implements IEventStream
             EventStream.throwError(EventStream.ERROR_SUBSCRIBING_HANDLER_NOT_TYPE_FUNCTION);
 
 
-        this.toggleSubscription(eventName,callback,true);
+        this.toggleSubscription(eventName,callback,true,context);
     }
 
     unSubscribe(eventName:string, callback:Function):void {
@@ -78,24 +84,30 @@ export class EventStream implements IEventStream
         return this.handlers[eventName] !== undefined && this.handlers[eventName].length > 0;
     }
 
-    protected toggleSubscription(eventName:string,callback:Function,subscribe:boolean):void
+    protected toggleSubscription(eventName:string,callback:Function,subscribe:boolean,context?:any):void
     {
-        let handlers:Array<Function> = this.getHandlers(eventName);
+        let handlers:Array<HandlerObject> = this.getHandlers(eventName);
 
-        if(handlers.indexOf(callback) !== -1)
+        for(var i= 0; i<handlers.length ; i++)
         {
-            if(subscribe === false)
-                handlers.splice(handlers.indexOf(callback),1);
+            var handler:HandlerObject = handlers[i];
+
+            if(handler.handler === callback)
+            {
+                if(subscribe === false)
+                {
+                    handlers.splice(handlers.indexOf(handler),1);
+                }
+
+                return;
+            }
         }
-        else
-        {
-            if(subscribe === true)
-                handlers.push(callback);
-        }
+
+        handlers.push(new HandlerObject(callback,context));
     }
-    protected getHandlers(eventName:string):Array<Function>
+    protected getHandlers(eventName:string):Array<HandlerObject>
     {
-        let handlers:Array<Function>;
+        let handlers:Array<HandlerObject>;
 
         handlers = this.handlers[eventName];
 

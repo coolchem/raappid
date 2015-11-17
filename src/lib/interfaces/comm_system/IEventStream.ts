@@ -4,7 +4,7 @@ export interface IEventStream
 {
     publish(eventName:string, data:any):void;
 
-    subscribe(eventName:string,callback: (data: any) => any):void;
+    subscribe(eventName:string,callback: (data: any) => any,context?:any):void;
 
     unSubscribe(eventName:string,callback:Function):void;
 

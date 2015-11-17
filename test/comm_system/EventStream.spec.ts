@@ -185,6 +185,34 @@ describe('EventStream', function() {
             eventStream.publish("event",eventData);
 
         });
+
+        it('should call the handler with right context if the context is passed while registering', function(done) {
+
+            var handlerContext ={};
+            var handler = function(){
+
+                expect(this).to.equal(handlerContext);
+                done();
+            };
+
+            eventStream.subscribe("action",handler,handlerContext);
+            eventStream.publish("action");
+
+        });
+
+        it('should call the handler with global context if no context is passed while subscribing', function(done) {
+
+
+            var handler = function(){
+
+                expect(this).to.equal(global);
+                done();
+            };
+
+            eventStream.subscribe("action",handler);
+            eventStream.publish("action");
+
+        });
     });
 
 

@@ -155,11 +155,11 @@ describe('ActionControl', function() {
         });
     });
 
-    describe("call",()=>{
+    describe("perform",()=>{
         it('should throw an error when taking action name not of type string', function(done) {
 
             throws = function() {
-                actionControl.call({});
+                actionControl.perform({});
             };
             expect(throws).to.throw(ActionControl.ERROR_TAKING_ACTION_ACTION_NAME_NOT_TYPE_STRING);
             done();
@@ -168,7 +168,7 @@ describe('ActionControl', function() {
         it('should throw an error when no handler found for the action', function(done) {
 
             throws = function() {
-                actionControl.call("action");
+                actionControl.perform("action");
             };
             expect(throws).to.throw(ActionControl.ERROR_TAKING_ACTION_NO_HANDLER_REGISTERED);
             done();
@@ -182,7 +182,7 @@ describe('ActionControl', function() {
 
             actionControl.registerAction("action",handler);
 
-            actionControl.call("action");
+            actionControl.perform("action");
         });
 
         it('should successfully call handler associated with the action, with appropriate parameters', function(done) {
@@ -199,7 +199,37 @@ describe('ActionControl', function() {
 
             actionControl.registerAction("action",handler);
 
-            actionControl.call("action",[paramA,paramB]);
+            actionControl.perform("action",paramA,paramB);
+
+        });
+
+        it('should call the handler with right context if the context is passed while registering', function(done) {
+
+            var handlerContext ={};
+            var paramA = "A";
+            var paramB = {};
+            var handler = function(param1,param2){
+
+                expect(this).to.equal(handlerContext);
+                done();
+            };
+
+            actionControl.registerAction("action",handler,handlerContext);
+
+            actionControl.perform("action",paramA,paramB);
+
+        });
+
+        it('should call the handler with global context if no context is passed while registering', function(done) {
+
+            var handler = function(){
+
+                expect(this).to.equal(global);
+                done();
+            };
+
+            actionControl.subscribe("action",handler);
+            actionControl.publish("action");
 
         });
 
@@ -210,7 +240,7 @@ describe('ActionControl', function() {
             };
             actionControl.registerAction("action",handler);
 
-            var result = actionControl.call("action", ["humm"]);
+            var result = actionControl.perform("action", "humm");
 
             expect(result).to.be.instanceof(Promise);
             done();
@@ -223,7 +253,7 @@ describe('ActionControl', function() {
             };
             actionControl.registerAction("action",handler);
 
-            var result = actionControl.call("action", ["humm"]);
+            var result = actionControl.perform("action", "humm");
 
             expect(result).to.be.instanceof(Promise);
             done();
@@ -360,6 +390,34 @@ describe('ActionControl', function() {
             });
 
             actionControl.publish("event",eventData);
+
+        });
+
+        it('should call the handler with right context if the context is passed while registering', function(done) {
+
+            var handlerContext ={};
+            var handler = function(){
+
+                expect(this).to.equal(handlerContext);
+                done();
+            };
+
+            actionControl.subscribe("action",handler,handlerContext);
+            actionControl.publish("action");
+
+        });
+
+        it('should call the handler with global context if no context is passed while subscribing', function(done) {
+
+
+            var handler = function(){
+
+                expect(this).to.equal(global);
+                done();
+            };
+
+            actionControl.subscribe("action",handler);
+            actionControl.publish("action");
 
         });
     });
