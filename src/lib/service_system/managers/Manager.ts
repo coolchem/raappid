@@ -1,6 +1,6 @@
-import {IActionControl} from "../interfaces/comm_system/IActionControl";
+import {IActionControl} from "../../interfaces/comm_system/IActionControl";
 
-export abstract class Service
+export abstract class Manager
 {
 
     protected actionControl:IActionControl;
