@@ -8,12 +8,17 @@ export abstract class Service
 
     constructor(actionControl:IActionControl) {
         this.actionControl = actionControl;
+        this.initialize();
     }
 
-    abstract registerActions():void;
+    protected abstract initialize():void;
 
-    protected call(actionName:string, params:Array<any>):Promise<any>{
-        return this.actionControl.call(actionName,params);
+    protected registerAction(actionName:string,handler:Function):void{
+        this.actionControl.registerAction(actionName,handler,this);
+    };
+
+    protected perform(actionName:string, params:Array<any>):Promise<any>{
+        return this.actionControl.perform(actionName,params);
     };
 
     unregisterAction(actionName:string,handler:Function):void{
@@ -24,7 +29,7 @@ export abstract class Service
         this.actionControl.publish(eventName,data);
     };
     subscribe(eventName:string,callback: (data: any) => any):void{
-        this.actionControl.subscribe(eventName,callback);
+        this.actionControl.subscribe(eventName,callback,this);
     };
     unSubscribe(eventName:string,callback:Function):void{
         this.actionControl.unSubscribe(eventName,callback);
