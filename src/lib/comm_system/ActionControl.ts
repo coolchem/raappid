@@ -82,7 +82,9 @@ export class ActionControl implements IActionControl
         if(!handler1)
             ActionControl.throwError(ActionControl.ERROR_TAKING_ACTION_NO_HANDLER_REGISTERED);
 
-        return Promise.resolve(handler1.handler.call(handler1.context,...argArray));
+        var handler:Function = handler1.handler;
+        var context:any = handler1.context;
+        return Promise.resolve(handler.call(context,...argArray));
     }
 
 

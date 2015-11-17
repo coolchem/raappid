@@ -13,6 +13,10 @@ class MockActionControl extends ActionControl
     {
         return this.eventStream;
     }
+
+    getHandlers():any{
+        return this.actionHandlers;
+    }
 }
 
 describe('ActionControl', function() {
@@ -22,7 +26,7 @@ describe('ActionControl', function() {
     var throws;
 
     beforeEach(function (done) {
-        actionControl = new ActionControl();
+        actionControl = new MockActionControl();
         throws = null;
         done();
     });
@@ -151,6 +155,18 @@ describe('ActionControl', function() {
                 actionControl.unregisterAction("event",{});
             };
             expect(throws).to.throw(ActionControl.ERROR_UNREGISTERING_ACTION_HANDLER_NOT_TYPE_FUNCTION);
+            done();
+        });
+
+        it('should successfully unregister action', function(done) {
+
+            function handler():void
+            {
+
+            }
+            actionControl.registerAction("action",handler);
+            actionControl.unregisterAction("action",handler);
+            expect(actionControl.getHandlers()["action"]).to.be.null;
             done();
         });
     });
