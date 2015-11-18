@@ -1,7 +1,9 @@
 
 var util = require('./util');
 
-util.exec("npm publish",function(err){
+util.series(["npm test",
+    "npm run build-release",
+    "npm publish"],function(err){
     if(err)
     {
         console.log(err);
@@ -10,3 +12,4 @@ util.exec("npm publish",function(err){
 
     process.exit(0);
 });
+

@@ -7,7 +7,6 @@ if(argv._ && argv._.length > 0) //look release build
 
     var cmd = "npm version " + argv._[0];
 
-    console.log(cmd);
     util.series(["npm test",
         "npm run build-release",
         cmd,
