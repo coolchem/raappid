@@ -28,5 +28,7 @@ else
     console.log('\n Options:\n\n raapid-release [release-type]' +
         '      --- Give type of release:  major | minor | patch | premajor | preminor | prepatch | prerelease\n'
     );
+
+    process.exit(1);
 }
 
