@@ -5,7 +5,7 @@ machine:
     version: 5.0.0
 dependencies:
   override:
-    - npm run install
+    - npm run install-deps
 
 test:
   post:
