@@ -51,7 +51,9 @@
     "build-release": "npm run build release",
     "test": "node scripts/test.js",
     "coverage": "node scripts/coverage.js",
-    "release": "node scripts/release.js",
+    "release-major": "node scripts/release.js major",
+    "release-minor": "node scripts/release.js minor",
+    "release-patch": "node scripts/release.js patch",
     "deploy": "node scripts/deploy.js"
   }
 }
