@@ -9,12 +9,13 @@ export class FileSystemService
 
     copyDirectory(directoryPath:string, destDir:string):Promise<boolean>{
 
-        return new Promise((resolve:Function)=>{
+        return new Promise((resolve,reject)=>{
 
             this.fs.copy(directoryPath,destDir,(error):void=>{
                 if (error)
                 {
-                    throw error;
+                    reject(error);
+                    return;
                 }
 
                 resolve(true);

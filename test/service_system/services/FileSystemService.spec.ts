@@ -89,6 +89,17 @@ describe('FileSystemService Test cases', () => {
 
     describe('copyDirectory', () => {
 
+        it('should throw error if path to the directory to be copied is invalid', function(done) {
+
+            fsService.copyDirectory(tempDirectoryPath+"/what",tempDirectoryPath+"/temp").then(()=>{
+               done("Copy directory should not have been successful");
+            }).catch((error)=>{
+
+                done();
+            });
+
+        });
+
         it('should successfully copy the dir', function(done) {
 
             fs.mkdirsSync(tempDirectoryPath+"/testCopyDir");
