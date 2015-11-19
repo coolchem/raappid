@@ -26,6 +26,7 @@
     "development"
   ],
   "dependencies": {
+    "fs-extra": "^0.26.2",
     "minimist": "^1.2.0"
   },
   "devDependencies": {
