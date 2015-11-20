@@ -2,6 +2,10 @@
 
 /// <reference path="typings/tsd.d.ts" />
 
+import main = require("./main");
+import viewSystem = require("./lib/view_system/view-system")
+import {CmdView} from "./lib/view_system/views/CmdView";
+
 var argv:any = require('minimist')(process.argv.slice(2));
 
 
@@ -9,22 +13,17 @@ var argv:any = require('minimist')(process.argv.slice(2));
 // before anything touches it
 process.env.INIT_CWD = process.cwd();
 
-function run():void {
+var cliView:CmdView = viewSystem.createView(CmdView);
 
-    //check if --help or -h show instructions and exit
-    if(argv.help === true || argv.h === true)
+cliView.processArguments(argv);
+
+process.on("exit",(code)=>{
+
+    if(code === 0)
     {
-        showInstructions();
+        console.log("\nYay!!l\n");
     }
-    else
-    {
 
-    }
-}
-
-function showInstructions(){
-
-}
+});
 
 
-run();
