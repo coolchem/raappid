@@ -21,7 +21,7 @@
       "commit": "001ca36ba58cef903c4c063555afb07bbc36bb58"
     },
     "chai/chai.d.ts": {
-      "commit": "001ca36ba58cef903c4c063555afb07bbc36bb58"
+      "commit": "78d36dd49b6b55b9fdfe61776a12bf05c8b07777"
     },
     "semver/semver.d.ts": {
       "commit": "001ca36ba58cef903c4c063555afb07bbc36bb58"
@@ -37,6 +37,15 @@
     },
     "fs-extra/fs-extra.d.ts": {
       "commit": "fc341765ebbb04b7109981a25dced01f488f4d94"
+    },
+    "sinon-chai/sinon-chai.d.ts": {
+      "commit": "78d36dd49b6b55b9fdfe61776a12bf05c8b07777"
+    },
+    "assertion-error/assertion-error.d.ts": {
+      "commit": "78d36dd49b6b55b9fdfe61776a12bf05c8b07777"
+    },
+    "sinon/sinon.d.ts": {
+      "commit": "78d36dd49b6b55b9fdfe61776a12bf05c8b07777"
     }
   }
 }

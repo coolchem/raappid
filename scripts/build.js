@@ -17,7 +17,7 @@ else //do dev build
     build();
 }
 
-function build(isRelease,watch){
+function build(isRelease){
 
     var cmd = "node_modules/.bin/tsc";
 

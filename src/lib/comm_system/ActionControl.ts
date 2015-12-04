@@ -17,7 +17,7 @@ export class ActionControl implements IActionControl
     static ERROR_UNREGISTERING_ACTION_NO_HANDLER_GIVEN:string = "Error un-registering action: No Handler set while subscribing to event";
 
     static ERROR_TAKING_ACTION_ACTION_NAME_NOT_TYPE_STRING:string = "Error taking Action: The action name should be of type string";
-    static ERROR_TAKING_ACTION_NO_HANDLER_REGISTERED:string = "Error taking Action: The handler registered for the action";
+    static ERROR_TAKING_ACTION_NO_HANDLER_REGISTERED:string = "Error taking Action: No handler registered for the action";
 
     static ERROR_SUBSCRIBING_EVENT_NAME_NOT_TYPE_STRING:string = "Error subscribing to Event: The event name should be of type string";
     static ERROR_SUBSCRIBING_HANDLER_NOT_TYPE_FUNCTION:string = "Error subscribing to Event: The callback should be of type function";
@@ -84,7 +84,15 @@ export class ActionControl implements IActionControl
 
         var handler:Function = handler1.handler;
         var context:any = handler1.context;
-        return Promise.resolve(handler.call(context,...argArray));
+        var promise;
+        try {
+            promise =  Promise.resolve(handler.call(context,...argArray))
+        }
+        catch (error)
+        {
+            return Promise.reject(error)
+        }
+        return promise;
     }
 
 
