@@ -3,8 +3,9 @@
 import chai = require('chai');
 import sinon = require('sinon');
 import chalk = require('chalk');
-
 import cliService =require("../../../src/lib/service_system/services/cli-service");
+
+chalk.enabled = true;
 
 chai.use(require("sinon-chai"));
 
@@ -15,7 +16,18 @@ describe('cli-service Test cases', () => {
     var expect = chai.expect;
     var logSpy = sinon.spy(console,"log");
 
+    afterEach(()=>{
+       logSpy.restore();
+        logSpy = sinon.spy(console,"log");
+    });
+
     describe('log', () => {
+
+        afterEach(()=>{
+            logSpy.restore();
+            logSpy = sinon.spy(console,"log");
+        });
+
 
         it('should call the console.log with the message', function(done) {
 
@@ -27,15 +39,11 @@ describe('cli-service Test cases', () => {
 
         it('should not throw error if color is null or undefined or empty string', function(done) {
 
-            cliService.log("message1","");
+            cliService.log("message","");
+            cliService.log("message");
+            cliService.log("message",null);
 
-            expect(logSpy).to.have.been.calledWith("message1");
-            cliService.log("message2");
-
-            expect(logSpy).to.have.been.calledWith("message2");
-            cliService.log("message3",null);
-
-            expect(logSpy).to.have.been.calledWith("message3");
+            expect(logSpy).to.have.been.calledWith("message").calledThrice;
 
             done();
 
@@ -114,7 +122,7 @@ describe('cli-service Test cases', () => {
 
         it('should log message in green', function(done) {
 
-            cliService.logError("message");
+            cliService.logSuccess("message");
             expect(logSpy).to.have.been.calledWith(chalk.green("message"));
             done();
         });
@@ -131,6 +139,8 @@ describe('cli-service Test cases', () => {
         afterEach(()=>{
             stdin.end();
             stdin.reset();
+            logSpy.restore();
+            logSpy = sinon.spy(console,"log");
         });
 
         it('should ask user for input', function(done) {
@@ -148,6 +158,29 @@ describe('cli-service Test cases', () => {
 
         });
 
+        it('should accept input when user hits return or enter', function(done) {
+
+            process.nextTick(function mockResponse() {
+                stdin.send('i am fine\r');
+            });
+
+            cliService.askInput("Hello how are u?").then((input)=>{
+
+                expect(input).to.equal("i am fine");
+
+                process.nextTick(function mockResponse() {
+                    stdin.send('i am fine\u0004');
+                });
+
+                cliService.askInput("Hello how are u?").then((input)=>{
+
+                    expect(input).to.equal("i am fine");
+                    done();
+                });
+            })
+
+        });
+
     });
 
     describe('confirm', () => {
@@ -159,6 +192,8 @@ describe('cli-service Test cases', () => {
         afterEach(()=>{
             stdin.end();
             stdin.reset();
+            logSpy.restore();
+            logSpy = sinon.spy(console,"log");
         });
 
         it('should ask user to give yes or no answer', function(done) {
@@ -167,19 +202,6 @@ describe('cli-service Test cases', () => {
 
             });
             expect(logSpy).to.have.been.calledWith("Are we there yet?[y/n]:");
-            done();
-        });
-
-
-        it('should re-ask the question if the answer is not yes/no or y/n', function(done) {
-
-            process.nextTick(function mockResponse() {
-                stdin.send('i do not know\n');
-            });
-
-            cliService.confirm("Are we there yet yet?").then(()=>{});
-
-            expect(logSpy).to.have.been.calledWithExactly("Are we there yet yet?[y/n]:");
             done();
         });
 
@@ -230,6 +252,23 @@ describe('cli-service Test cases', () => {
                 })
 
             })
+        });
+
+        it('should re-ask the question if the answer is not yes/no or y/n', function(done) {
+
+            process.nextTick(function mockResponse() {
+                stdin.send('i do not know\n');
+            });
+
+            cliService.confirm("Are we there yet yet?").then((answer)=>{
+
+                expect(logSpy).to.have.been.calledWith("Are we there yet yet?[y/n]:").calledTwice;
+                done();
+            });
+
+            setTimeout(()=>{
+                stdin.send('y\n');
+            },500)
         });
 
     });

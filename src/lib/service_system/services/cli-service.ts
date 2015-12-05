@@ -2,16 +2,16 @@
 
 
 import chalk = require('chalk');
-
+chalk.enabled = true;
 
 export const ERROR_UNSUPPORTED_COLOR:string = `Error logging message: The color sent to log the message unsupported
                                                Please send one of the following colors: red,blue,green,yellow`;
 
 export function confirm(question:string):Promise<boolean>
 {
-    question += '[y/n]';
+    var questionNew = question + '[y/n]';
 
-    var promise = askInput(question);
+    var promise = askInput(questionNew);
 
     return promise.then((answer)=>{
         if (answer.match(/\b(no|n)\b/i))
