@@ -2,8 +2,11 @@
 
 
 import {Manager} from "./Manager";
-export class AppManager extends Manager
+import {Action} from "../service-system";
+import {Event} from "../service-system";
+export class CLIManager extends Manager
 {
+
     static CLI_HELP_TEXT:string =
         `Command:
 
@@ -48,14 +51,14 @@ export class AppManager extends Manager
 
     protected initialize():void {
 
-        this.registerAction("processCLIArguments",this.processCLIArguments)
+        this.registerAction(Action.PROCESS_ARGUMENTS,this.processArguments);
     }
 
-    processCLIArguments(argv:any):Promise<any>
+    processArguments(argv:any):Promise<any>
     {
         if(argv.help === true || argv.h === true)
         {
-            this.publish("cliLog",AppManager.CLI_HELP_TEXT);
+            this.publish(Event.LOG,CLIManager.CLI_HELP_TEXT);
             return;
         }
 
@@ -63,13 +66,13 @@ export class AppManager extends Manager
 
         if(commands.length < 2)
         {
-            this.publish("cliLogError",AppManager.ERROR_ARGUMENTS_MISMATCH);
-            throw new Error(AppManager.ERROR_ARGUMENTS_MISMATCH);
+            this.publish(Event.LOG_ERROR,CLIManager.ERROR_ARGUMENTS_MISMATCH);
+            throw new Error(CLIManager.ERROR_ARGUMENTS_MISMATCH);
         }
         else if(commands.length > 2)
         {
-            this.publish("cliLogError",AppManager.ERROR_INVALID_PROJECT_NAME);
-            throw new Error(AppManager.ERROR_INVALID_PROJECT_NAME);
+            this.publish(Event.LOG_ERROR,CLIManager.ERROR_INVALID_PROJECT_NAME);
+            throw new Error(CLIManager.ERROR_INVALID_PROJECT_NAME);
         }
 
         var projectType:string = commands[0];
@@ -86,26 +89,29 @@ export class AppManager extends Manager
 
         if(rx.test(projectName))
         {
-            this.publish("cliLogError",AppManager.ERROR_INVALID_PROJECT_NAME);
-            throw new Error(AppManager.ERROR_INVALID_PROJECT_NAME);
+            this.publish(Event.LOG_ERROR,CLIManager.ERROR_INVALID_PROJECT_NAME);
+            throw new Error(CLIManager.ERROR_INVALID_PROJECT_NAME);
         }
 
         if(projectType !== "node-app" &&  projectType !== "web-app" && projectType !== "template")
         {
-            this.publish("cliLogError",AppManager.ERROR_INVALID_PROJECT_TYPE);
-            throw new Error(AppManager.ERROR_INVALID_PROJECT_TYPE);
+            this.publish(Event.LOG_ERROR,CLIManager.ERROR_INVALID_PROJECT_TYPE);
+            throw new Error(CLIManager.ERROR_INVALID_PROJECT_TYPE);
         }
 
-        return new Promise((resolve,reject)=>{
+        return new Promise((resolve,reject)=>
+        {
+
             this.perform("createProject",projectType,projectName,templateName).then((result:string)=>{
 
-                this.publish("cliLogSuccess",result);
+                this.publish(Event.LOG_SUCCESS,result);
+
                 resolve(result);
 
 
             },(error)=>{
 
-                this.publish("cliLogError",error);
+                this.publish(Event.LOG_ERROR,error);
                 reject(error);
             });
         })

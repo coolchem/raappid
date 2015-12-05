@@ -3,7 +3,7 @@
 /// <reference path="../../../src/typings/tsd.d.ts" />
 
 import chai = require('chai');
-import {FileSystemService} from "../../../src/lib/service_system/services/FileSystemService";
+import fsService =require("../../../src/lib/service_system/services/fs-service");
 
 var fs = require("fs-extra");
 var path = require('path');
@@ -11,9 +11,8 @@ var path = require('path');
 var testDir:string = path.resolve("./test");
 var tempDirectoryPath = testDir + "/tempDir";
 
-describe('FileSystemService Test cases', () => {
+describe('fs-service Test cases', () => {
 
-    var fsService:FileSystemService = new FileSystemService();
     var expect = chai.expect;
     var assert = chai.assert;
 
