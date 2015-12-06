@@ -5,9 +5,10 @@ import sinon = require('sinon');
 import ps =require("../../../src/lib/service_system/services/project-service");
 import path = require("path");
 import fs = require("fs-extra");
+import shell = require("../../../src/lib/service_system/utils/shell-util")
 
 chai.use(require("sinon-chai"));
-
+require('sinon-as-promised');
 
 describe('project-service Test cases', () => {
 
@@ -72,7 +73,7 @@ describe('project-service Test cases', () => {
 
         beforeEach((done)=>{
 
-            spyExec = sinon.spy(require('child_process'),"spawn");
+            spyExec = sinon.spy(require('../../../src/lib/service_system/utils/shell-util'),"exec");
             fs.mkdirs(tempProjectDir, function (err) {
                 fs.writeFileSync(tempProjectDir+"/package.json",JSON.stringify({version:"0.0.1",  devDependencies: {"typescript": "^1.7"}}, null, '  ') + '\n');
                 fs.mkdirsSync(tempProjectDir+"/scripts");
@@ -83,7 +84,9 @@ describe('project-service Test cases', () => {
 
         afterEach(()=>{
             fs.removeSync(tempProjectDir);
-            spyExec.restore();
+
+            if(spyExec.restore)
+                spyExec.restore();
         });
 
 
@@ -206,6 +209,73 @@ describe('project-service Test cases', () => {
             },(error)=>{
 
                 done("Should never have thrown error\n");
+            });
+        });
+
+        it('should reject with error if install.js script has error', function(done) {
+
+            fs.writeFileSync(tempProjectDir +"/scripts/install.js",`
+             var execSync = require('child_process').execSync;
+
+             execSync("node eertetet");
+
+             process.exit(0)
+            `);
+
+            ps.initializeProject(tempProjectDir).then((result)=>{
+
+
+                done("Should never have passed\n");
+
+            },(error)=>{
+
+                expect(spyExec).to.have.been.calledOnce;
+                expect(error).to.be.instanceOf(Error);
+                done();
+            });
+        });
+
+        it('should reject with error if no install script was found and npm install throws error', function(done) {
+
+            spyExec.restore();
+            var shellStub:any = sinon.stub(shell,"exec");
+            shellStub.rejects(new Error("humm"));
+
+            ps.initializeProject(tempProjectDir).then((result)=>{
+
+                shellStub.restore();
+                done("Should never have passed\n");
+
+            },(error)=>{
+
+                expect(shellStub).to.have.been.calledOnce;
+                expect(error).to.be.instanceOf(Error);
+                shellStub.restore();
+                done();
+            });
+        });
+
+        it('should reject with error if install script was found and npm install throws error', function(done) {
+
+            spyExec.restore();
+            var shellStub:any = sinon.stub(shell,"exec");
+            shellStub.onCall(0).resolves(true);
+            shellStub.onCall(1).rejects(new Error("humm"));
+            fs.writeFileSync(tempProjectDir +"/scripts/install.js",
+                `
+                 console.log('yay')
+                `);
+
+            ps.initializeProject(tempProjectDir).then((result)=>{
+                shellStub.restore();
+                done("Should never have passed\n");
+
+            },(error)=>{
+
+                expect(shellStub).to.have.been.calledTwice;
+                expect(error).to.be.instanceOf(Error);
+                shellStub.restore();
+                done();
             });
         });
 

@@ -38,6 +38,7 @@
     "mocha": "^2.3.3",
     "mock-stdin": "^0.3.0",
     "sinon": "^1.17.2",
+    "sinon-as-promised": "^4.0.0",
     "sinon-chai": "^2.8.0",
     "tsd": "^0.6.5",
     "typescript": "^1.6.2"
