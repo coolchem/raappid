@@ -14,11 +14,13 @@ var stdin = require('mock-stdin').stdin();
 describe('cli-service Test cases', () => {
 
     var expect = chai.expect;
-    var logSpy = sinon.spy(console,"log");
+    var logSpy;
 
+    beforeEach(()=>{
+        logSpy = sinon.spy(console,"log");
+    });
     afterEach(()=>{
        logSpy.restore();
-        logSpy = sinon.spy(console,"log");
     });
 
     describe('log', () => {
@@ -27,7 +29,6 @@ describe('cli-service Test cases', () => {
             logSpy.restore();
             logSpy = sinon.spy(console,"log");
         });
-
 
         it('should call the console.log with the message', function(done) {
 
