@@ -30,7 +30,7 @@ export abstract class Manager
     };
 
     protected subscribe(eventName:string,callback: (data: any) => any):void{
-        this.actionControl.subscribe(eventName,callback,this);
+        this.actionControl.subscribe(eventName,callback);
     };
     protected unSubscribe(eventName:string,callback:Function):void{
         this.actionControl.unSubscribe(eventName,callback);

@@ -1,55 +1,19 @@
 /// <reference path="../../src/typings/tsd.d.ts" />
 
 
-import {ActionControl} from "../../src/lib/comm_system/ActionControl";
-import {EventStream} from "../../src/lib/comm_system/EventStream";
-import {IEventStream} from "../../src/lib/interfaces/comm_system/IEventStream";
-
 import chai = require('chai');
 
-class MockActionControl extends ActionControl
-{
-    getEventStream():IEventStream
-    {
-        return this.eventStream;
-    }
+import ac from "../../src/lib/comm_system/action-control";
+import {Errors} from "../../src/lib/comm_system/index";
 
-    getHandlers():any{
-        return this.actionHandlers;
-    }
-}
-
-describe('ActionControl', function() {
+describe('action-control', function() {
 
     var expect = chai.expect;
     var actionControl;
     var throws;
 
     beforeEach(function (done) {
-        actionControl = new MockActionControl();
         throws = null;
-        done();
-    });
-
-
-    it('should create its own instance of event stream if no intance in passed in constructor', function(done) {
-        actionControl = new MockActionControl();
-        expect(actionControl.getEventStream()).to.not.be.undefined;
-        expect(actionControl.getEventStream()).to.not.be.null;
-
-        actionControl = new MockActionControl(null);
-        expect(actionControl.getEventStream()).to.not.be.undefined;
-        expect(actionControl.getEventStream()).to.not.be.null;
-
-        done();
-    });
-
-    it('should use instance of event stream passed in the constructor', function(done) {
-
-        var customEventStream = new EventStream();
-
-        actionControl = new MockActionControl(customEventStream);
-        expect(actionControl.getEventStream()).to.equal(customEventStream);
         done();
     });
 
@@ -58,17 +22,17 @@ describe('ActionControl', function() {
             throws = function() {
                 actionControl.registerAction({});
             };
-            expect(throws).to.throw(ActionControl.ERROR_REGISTERING_ACTION_NAME_NOT_TYPE_STRING);
+            expect(throws).to.throw(Errors.ERROR_REGISTERING_ACTION_NAME_NOT_TYPE_STRING);
 
             throws = function() {
                 actionControl.registerAction();
             };
-            expect(throws).to.throw(ActionControl.ERROR_REGISTERING_ACTION_NAME_NOT_TYPE_STRING);
+            expect(throws).to.throw(Errors.ERROR_REGISTERING_ACTION_NAME_NOT_TYPE_STRING);
 
             throws = function() {
                 actionControl.registerAction(null);
             };
-            expect(throws).to.throw(ActionControl.ERROR_REGISTERING_ACTION_NAME_NOT_TYPE_STRING);
+            expect(throws).to.throw(Errors.ERROR_REGISTERING_ACTION_NAME_NOT_TYPE_STRING);
 
             done();
         });
@@ -79,13 +43,13 @@ describe('ActionControl', function() {
                 actionControl.registerAction("action");
             };
 
-            expect(throws).to.throw(ActionControl.ERROR_REGISTERING_ACTION_NO_HANDLER_GIVEN);
+            expect(throws).to.throw(Errors.ERROR_REGISTERING_ACTION_NO_HANDLER_GIVEN);
 
             throws = function() {
                 actionControl.registerAction("event",null);
             };
 
-            expect(throws).to.throw(ActionControl.ERROR_REGISTERING_ACTION_NO_HANDLER_GIVEN);
+            expect(throws).to.throw(Errors.ERROR_REGISTERING_ACTION_NO_HANDLER_GIVEN);
 
             done();
         });
@@ -96,7 +60,7 @@ describe('ActionControl', function() {
                 actionControl.registerAction("event",{});
             };
 
-            expect(throws).to.throw(ActionControl.ERROR_REGISTERING_ACTION_HANDLER_NOT_TYPE_FUNCTION);
+            expect(throws).to.throw(Errors.ERROR_REGISTERING_ACTION_HANDLER_NOT_TYPE_FUNCTION);
             done();
         });
 
@@ -107,7 +71,7 @@ describe('ActionControl', function() {
                 actionControl.registerAction("event",function(){});
             };
 
-            expect(throws).to.throw(ActionControl.ERROR_REGISTERING_ACTION_ONLY_ONE_HANDLER_ALLOWED);
+            expect(throws).to.throw(Errors.ERROR_REGISTERING_ACTION_ONLY_ONE_HANDLER_ALLOWED);
             done();
         });
     });
@@ -117,17 +81,17 @@ describe('ActionControl', function() {
             throws = function() {
                 actionControl.unregisterAction({});
             };
-            expect(throws).to.throw(ActionControl.ERROR_UNREGISTERING_ACTION_NAME_NOT_TYPE_STRING);
+            expect(throws).to.throw(Errors.ERROR_UNREGISTERING_ACTION_NAME_NOT_TYPE_STRING);
 
             throws = function() {
                 actionControl.unregisterAction();
             };
-            expect(throws).to.throw(ActionControl.ERROR_UNREGISTERING_ACTION_NAME_NOT_TYPE_STRING);
+            expect(throws).to.throw(Errors.ERROR_UNREGISTERING_ACTION_NAME_NOT_TYPE_STRING);
 
             throws = function() {
                 actionControl.unregisterAction(null);
             };
-            expect(throws).to.throw(ActionControl.ERROR_UNREGISTERING_ACTION_NAME_NOT_TYPE_STRING);
+            expect(throws).to.throw(Errors.ERROR_UNREGISTERING_ACTION_NAME_NOT_TYPE_STRING);
 
             done();
         });
@@ -138,13 +102,13 @@ describe('ActionControl', function() {
                 actionControl.unregisterAction("event");
             };
 
-            expect(throws).to.throw(ActionControl.ERROR_UNREGISTERING_ACTION_NO_HANDLER_GIVEN);
+            expect(throws).to.throw(Errors.ERROR_UNREGISTERING_ACTION_NO_HANDLER_GIVEN);
 
             throws = function() {
                 actionControl.unregisterAction("event",null);
             };
 
-            expect(throws).to.throw(ActionControl.ERROR_UNREGISTERING_ACTION_NO_HANDLER_GIVEN);
+            expect(throws).to.throw(Errors.ERROR_UNREGISTERING_ACTION_NO_HANDLER_GIVEN);
 
             done();
         });
@@ -154,7 +118,7 @@ describe('ActionControl', function() {
             throws = function() {
                 actionControl.unregisterAction("event",{});
             };
-            expect(throws).to.throw(ActionControl.ERROR_UNREGISTERING_ACTION_HANDLER_NOT_TYPE_FUNCTION);
+            expect(throws).to.throw(Errors.ERROR_UNREGISTERING_ACTION_HANDLER_NOT_TYPE_FUNCTION);
             done();
         });
 
@@ -177,7 +141,7 @@ describe('ActionControl', function() {
             throws = function() {
                 actionControl.perform({});
             };
-            expect(throws).to.throw(ActionControl.ERROR_TAKING_ACTION_ACTION_NAME_NOT_TYPE_STRING);
+            expect(throws).to.throw(Errors.ERROR_TAKING_ACTION_ACTION_NAME_NOT_TYPE_STRING);
             done();
         });
 
@@ -186,7 +150,7 @@ describe('ActionControl', function() {
             throws = function() {
                 actionControl.perform("action");
             };
-            expect(throws).to.throw(ActionControl.ERROR_TAKING_ACTION_NO_HANDLER_REGISTERED);
+            expect(throws).to.throw(Errors.ERROR_TAKING_ACTION_NO_HANDLER_REGISTERED);
             done();
         });
 
@@ -287,17 +251,17 @@ describe('ActionControl', function() {
             throws = function() {
                 actionControl.subscribe({});
             };
-            expect(throws).to.throw(ActionControl.ERROR_SUBSCRIBING_EVENT_NAME_NOT_TYPE_STRING);
+            expect(throws).to.throw(Errors.ERROR_SUBSCRIBING_EVENT_NAME_NOT_TYPE_STRING);
 
             throws = function() {
                 actionControl.subscribe();
             };
-            expect(throws).to.throw(ActionControl.ERROR_SUBSCRIBING_EVENT_NAME_NOT_TYPE_STRING);
+            expect(throws).to.throw(Errors.ERROR_SUBSCRIBING_EVENT_NAME_NOT_TYPE_STRING);
 
             throws = function() {
                 actionControl.subscribe(null);
             };
-            expect(throws).to.throw(ActionControl.ERROR_SUBSCRIBING_EVENT_NAME_NOT_TYPE_STRING);
+            expect(throws).to.throw(Errors.ERROR_SUBSCRIBING_EVENT_NAME_NOT_TYPE_STRING);
 
             done();
         });
@@ -308,13 +272,13 @@ describe('ActionControl', function() {
                 actionControl.subscribe("event");
             };
 
-            expect(throws).to.throw(ActionControl.ERROR_NO_HANDLER_WHILE_SUBSCRIBING);
+            expect(throws).to.throw(Errors.ERROR_NO_HANDLER_WHILE_SUBSCRIBING);
 
             throws = function() {
                 actionControl.subscribe("event",null);
             };
 
-            expect(throws).to.throw(ActionControl.ERROR_NO_HANDLER_WHILE_SUBSCRIBING);
+            expect(throws).to.throw(Errors.ERROR_NO_HANDLER_WHILE_SUBSCRIBING);
 
             done();
         });
@@ -325,7 +289,7 @@ describe('ActionControl', function() {
                 actionControl.subscribe("event",{});
             };
 
-            expect(throws).to.throw(ActionControl.ERROR_SUBSCRIBING_HANDLER_NOT_TYPE_FUNCTION);
+            expect(throws).to.throw(Errors.ERROR_SUBSCRIBING_HANDLER_NOT_TYPE_FUNCTION);
             done();
         });
 
@@ -345,17 +309,17 @@ describe('ActionControl', function() {
             throws = function() {
                 actionControl.publish({});
             };
-            expect(throws).to.throw(ActionControl.ERROR_PUBLISHING_EVENT_NAME_NOT_TYPE_STRING);
+            expect(throws).to.throw(Errors.ERROR_PUBLISHING_EVENT_NAME_NOT_TYPE_STRING);
 
             throws = function() {
                 actionControl.publish();
             };
-            expect(throws).to.throw(ActionControl.ERROR_PUBLISHING_EVENT_NAME_NOT_TYPE_STRING);
+            expect(throws).to.throw(Errors.ERROR_PUBLISHING_EVENT_NAME_NOT_TYPE_STRING);
 
             throws = function() {
                 actionControl.publish(null);
             };
-            expect(throws).to.throw(ActionControl.ERROR_PUBLISHING_EVENT_NAME_NOT_TYPE_STRING);
+            expect(throws).to.throw(Errors.ERROR_PUBLISHING_EVENT_NAME_NOT_TYPE_STRING);
 
             done();
         });
@@ -443,17 +407,17 @@ describe('ActionControl', function() {
             throws = function() {
                 actionControl.unSubscribe({});
             };
-            expect(throws).to.throw(ActionControl.ERROR_UNSUBSCRIBING_EVENT_NAME_NOT_TYPE_STRING);
+            expect(throws).to.throw(Errors.ERROR_UNSUBSCRIBING_EVENT_NAME_NOT_TYPE_STRING);
 
             throws = function() {
                 actionControl.unSubscribe();
             };
-            expect(throws).to.throw(ActionControl.ERROR_UNSUBSCRIBING_EVENT_NAME_NOT_TYPE_STRING);
+            expect(throws).to.throw(Errors.ERROR_UNSUBSCRIBING_EVENT_NAME_NOT_TYPE_STRING);
 
             throws = function() {
                 actionControl.unSubscribe(null);
             };
-            expect(throws).to.throw(ActionControl.ERROR_UNSUBSCRIBING_EVENT_NAME_NOT_TYPE_STRING);
+            expect(throws).to.throw(Errors.ERROR_UNSUBSCRIBING_EVENT_NAME_NOT_TYPE_STRING);
 
             done();
         });
@@ -464,13 +428,13 @@ describe('ActionControl', function() {
                 actionControl.unSubscribe("event");
             };
 
-            expect(throws).to.throw(ActionControl.ERROR_NO_HANDLER_WHILE_UNSUBSCRIBING);
+            expect(throws).to.throw(Errors.ERROR_NO_HANDLER_WHILE_UNSUBSCRIBING);
 
             throws = function() {
                 actionControl.unSubscribe("event",null);
             };
 
-            expect(throws).to.throw(ActionControl.ERROR_NO_HANDLER_WHILE_UNSUBSCRIBING);
+            expect(throws).to.throw(Errors.ERROR_NO_HANDLER_WHILE_UNSUBSCRIBING);
 
             done();
         });
@@ -480,7 +444,7 @@ describe('ActionControl', function() {
             throws = function() {
                 actionControl.unSubscribe("event",{});
             };
-            expect(throws).to.throw(ActionControl.ERROR_UNSUBSCRIBING_HANDLER_NOT_TYPE_FUNCTION);
+            expect(throws).to.throw(Errors.ERROR_UNSUBSCRIBING_HANDLER_NOT_TYPE_FUNCTION);
             done();
         });
 

@@ -1,5 +1,7 @@
 
 import {Manager} from "./Manager";
+import ps = require("../services/project-service");
+
 export class ProjectManager extends Manager
 {
 
