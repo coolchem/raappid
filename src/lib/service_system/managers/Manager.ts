@@ -29,8 +29,8 @@ export abstract class Manager
         this.actionControl.publish(eventName,data);
     };
 
-    protected subscribe(eventName:string,callback: (data: any) => any):void{
-        this.actionControl.subscribe(eventName,callback);
+    protected subscribe(eventName:string,callback:(...args:any[])=>any):void{
+        this.actionControl.subscribe(eventName,callback,this);
     };
     protected unSubscribe(eventName:string,callback:Function):void{
         this.actionControl.unSubscribe(eventName,callback);

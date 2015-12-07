@@ -2,20 +2,32 @@
 
 
 import chai = require('chai');
+import sinon = require('sinon');
+import actionControl1 from "../../src/lib/comm_system/action-control";
+import {Errors} from "../../src/lib/comm_system/action-control";
+import SinonSpy = Sinon.SinonSpy;
+chai.use(require("sinon-chai"));
 
-import ac from "../../src/lib/comm_system/action-control";
-import {Errors} from "../../src/lib/comm_system/index";
 
 describe('action-control', function() {
 
     var expect = chai.expect;
-    var actionControl;
+    var actionControl:any = actionControl1;
     var throws;
 
     beforeEach(function (done) {
         throws = null;
         done();
     });
+
+    var actionNumber:number = 0;
+    function registerAction(handler,handlerContext?):string
+    {
+        var action:string = "action"+actionNumber;
+        actionControl.registerAction("action"+actionNumber,handler,handlerContext);
+        actionNumber++;
+        return action;
+    }
 
     describe("registerAction",()=>{
         it('should throw an error when registering action with actionName not of type string', function(done) {
@@ -130,7 +142,7 @@ describe('action-control', function() {
             }
             actionControl.registerAction("action",handler);
             actionControl.unregisterAction("action",handler);
-            expect(actionControl.getHandlers()["action"]).to.be.null;
+            expect(actionControl.hasAction("action")).to.be.false;
             done();
         });
     });
@@ -160,9 +172,9 @@ describe('action-control', function() {
                 done();
             };
 
-            actionControl.registerAction("action",handler);
+            var action = registerAction(handler);
 
-            actionControl.perform("action");
+            actionControl.perform(action);
         });
 
         it('should successfully call handler associated with the action, with appropriate parameters', function(done) {
@@ -177,9 +189,9 @@ describe('action-control', function() {
                 done();
             };
 
-            actionControl.registerAction("action",handler);
+            var action = registerAction(handler);
 
-            actionControl.perform("action",paramA,paramB);
+            actionControl.perform(action,paramA,paramB);
 
         });
 
@@ -194,9 +206,9 @@ describe('action-control', function() {
                 done();
             };
 
-            actionControl.registerAction("action",handler,handlerContext);
+            var action = registerAction(handler,handlerContext);
 
-            actionControl.perform("action",paramA,paramB);
+            actionControl.perform(action,paramA,paramB);
 
         });
 
@@ -208,8 +220,8 @@ describe('action-control', function() {
                 done();
             };
 
-            actionControl.subscribe("action",handler);
-            actionControl.publish("action");
+            var action = registerAction(handler);
+            actionControl.perform(action);
 
         });
 
@@ -218,9 +230,9 @@ describe('action-control', function() {
             var handler = function(data){
                 return new Promise(function(){});
             };
-            actionControl.registerAction("action",handler);
+            var action = registerAction(handler);
 
-            var result = actionControl.perform("action", "humm");
+            var result = actionControl.perform(action, "humm");
 
             expect(result).to.be.instanceof(Promise);
             done();
@@ -231,11 +243,45 @@ describe('action-control', function() {
             var handler = function(data){
                 return true;
             };
-            actionControl.registerAction("action",handler);
+            var action = registerAction(handler);
 
-            var result = actionControl.perform("action", "humm");
+            var result = actionControl.perform(action, "humm");
 
             expect(result).to.be.instanceof(Promise);
+            done();
+        });
+
+        it('should reject with error if handler throws error', function(done) {
+
+            var handler = function(data){
+                throw new Error("yay");
+            };
+            var action = registerAction(handler);
+
+            var result = actionControl.perform(action, "humm");
+
+            expect(result).to.be.instanceof(Promise);
+
+            result.then(null,(error)=>{
+                expect(error).to.be.instanceof(Error);
+                expect(error.message).to.equal("yay");
+                done();
+            })
+
+        });
+    });
+
+
+    describe("hasAction",()=>{
+        it('should return true if action registered', function(done) {
+            var action = registerAction(function(){});
+
+            expect(actionControl.hasAction(action)).to.be.true;
+            done();
+        });
+
+        it('should return false if no action registered', function(done) {
+            expect(actionControl.hasAction("ewrwer")).to.be.false;
             done();
         });
     });
@@ -326,52 +372,21 @@ describe('action-control', function() {
 
         it('should successfully publish event of type string to all the handlers', function(done) {
 
-            var handler1Called = false;
-            var handler2Called = false;
+           var eventData:any = {};
+           var spy1:SinonSpy = sinon.spy(()=>{});
+           var spy2:SinonSpy = sinon.spy(()=>{});
 
-            var noOfhandlersCalled = 0;
-
-            var handler1 = function(data){
-                noOfhandlersCalled++;
-                handler1Called = true;
-                if(handler1Called && handler2Called)
-                    completeTest();
-
-            };
-
-            var handler2 = function(data){
-                noOfhandlersCalled++;
-                handler2Called = true;
-                if(handler1Called && handler2Called)
-                    completeTest();
-            };
-
-            actionControl.subscribe("event", handler1);
-            actionControl.subscribe("event", handler2);
-
-            actionControl.publish("event");
-
-            function completeTest(){
-
-                expect(noOfhandlersCalled).to.equal(2);
-                done();
-            }
-
-        });
-
-        it('should successfully call all the handlers with published data', function(done) {
-
-            var eventData = {};
-            actionControl.subscribe("event", function(data){
-
-                expect(data).to.equal(eventData);
-                done();
-
-            });
+            actionControl.subscribe("event", spy1);
+            actionControl.subscribe("event", spy2);
 
             actionControl.publish("event",eventData);
 
+            expect(spy1).to.have.been.calledWith(sinon.match.same(eventData)).calledOnce;
+            expect(spy2).to.have.been.calledWith(sinon.match.same(eventData)).calledOnce;
+            done();
+
         });
+
 
         it('should call the handler with right context if the context is passed while registering', function(done) {
 
@@ -382,8 +397,8 @@ describe('action-control', function() {
                 done();
             };
 
-            actionControl.subscribe("action",handler,handlerContext);
-            actionControl.publish("action");
+            actionControl.subscribe("action123123",handler,handlerContext);
+            actionControl.publish("action123123");
 
         });
 
@@ -460,9 +475,7 @@ describe('action-control', function() {
             expect(actionControl.hasSubscribers("event")).to.be.true;
 
             actionControl.unSubscribe("event",handler1);
-
-            var handlers = actionControl.eventStream.handlers["event"];
-            expect(handlers.length).to.equal(1);
+            expect(actionControl.hasSubscribers("event")).to.equal(true);
 
             done();
         });
