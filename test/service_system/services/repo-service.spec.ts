@@ -8,6 +8,7 @@ import fs = require("fs-extra");
 import shell = require("../../../src/lib/service_system/utils/shell-util");
 import SinonStub = Sinon.SinonStub;
 import SinonSpy = Sinon.SinonSpy;
+import ErrnoException = NodeJS.ErrnoException;
 
 var which = require("which");
 
@@ -190,10 +191,11 @@ describe('repo-service Test cases', () => {
     describe('createRemoteRepository', () => {
 
         var spy:SinonSpy;
-        var stub:SinonStub;
+        var stub:any;
         beforeEach(function () {
             spy = sinon.spy(repoService.github, "authenticate");
-            stub = sinon.stub(repoService.github.repos, "create").yieldsTo("yay");        });
+            stub = sinon.stub(repoService.github.repos, "create");
+        });
         afterEach(function () {
             spy.restore();
             stub.restore();
@@ -213,14 +215,35 @@ describe('repo-service Test cases', () => {
 
         });
 
-        it('should create remote repo with the given repo name', function(done) {
+        it('should resolves with result of the create repo with', function(done) {
 
-            repoService.createRemoteRepository("test","test","test").then(()=>{});
+            stub.yields(null,"yay");
+            repoService.createRemoteRepository("test","test","test").then((result)=>{
 
-            expect(stub).to.have.been.calledWith({
-                name: "test"
+                expect(stub).to.have.been.calledWith({
+                    name: "test"
+                });
+                expect(result).to.equal("yay");
+                done();
+
+            },(error)=>{});
+
+        });
+
+        it('should reject with error if the create repo throws an error', function(done) {
+
+            stub.yields(new Error("yay"));
+            repoService.createRemoteRepository("test","test","test").then(()=>{},(error)=>{
+
+                expect(stub).to.have.been.calledWith({
+                    name: "test"
+                });
+                expect(error).to.be.instanceOf(Error);
+                expect(error.message).to.equal("yay");
+                done();
+
             });
-            done();
+
         });
 
     });
