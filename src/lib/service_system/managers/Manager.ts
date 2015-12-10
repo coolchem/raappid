@@ -1,4 +1,5 @@
 import {IActionControl} from "../../interfaces/comm_system/IActionControl";
+import {actionControl as ac} from "../../config"
 
 export abstract class Manager
 {
@@ -6,8 +7,8 @@ export abstract class Manager
     protected actionControl:IActionControl;
 
 
-    constructor(actionControl:IActionControl) {
-        this.actionControl = actionControl;
+    constructor() {
+        this.actionControl = ac;
         this.initialize();
     }
 

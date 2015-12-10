@@ -3,8 +3,8 @@
 
 import chai = require('chai');
 import sinon = require('sinon');
-import actionControl1 from "../../src/lib/comm_system/action-control";
-import {Errors} from "../../src/lib/comm_system/action-control";
+import actionControl1 = require("../../src/lib/comm_system/action-control");
+import {Errors} from "../../src/lib/comm_system/index";
 import SinonSpy = Sinon.SinonSpy;
 chai.use(require("sinon-chai"));
 

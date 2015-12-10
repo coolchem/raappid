@@ -1,4 +1,6 @@
 import {IActionControl} from "../../interfaces/comm_system/IActionControl";
+import {actionControl as ac} from "../../config"
+
 
 export abstract class View{
 

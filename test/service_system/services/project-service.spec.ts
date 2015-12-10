@@ -6,9 +6,12 @@ import ps =require("../../../src/lib/service_system/services/project-service");
 import path = require("path");
 import fs = require("fs-extra");
 import shell = require("../../../src/lib/service_system/utils/shell-util")
+import SinonStub = Sinon.SinonStub;
+import SinonSpy = Sinon.SinonSpy;
 
 chai.use(require("sinon-chai"));
 require('sinon-as-promised');
+
 
 describe('project-service Test cases', () => {
 
@@ -65,17 +68,117 @@ describe('project-service Test cases', () => {
 
     });
 
-    describe('initializeProject', () => {
-
+    describe('downloadTemplate', () => {
 
         var tempProjectDir:string = path.resolve("./test/tempProject");
-        var spyExec;
+        var stubExec;
 
         beforeEach((done)=>{
 
-            spyExec = sinon.spy(require('../../../src/lib/service_system/utils/shell-util'),"exec");
+            stubExec = sinon.stub(shell,"exec");
             fs.mkdirs(tempProjectDir, function (err) {
-                fs.writeFileSync(tempProjectDir+"/package.json",JSON.stringify({version:"0.0.1",  devDependencies: {"typescript": "^1.7"}}, null, '  ') + '\n');
+                fs.writeFileSync(tempProjectDir+"/package.json",JSON.stringify({version:"0.0.1",  devDependencies: {}}, null, '  ') + '\n');
+
+                done();
+            })
+
+        });
+
+        afterEach(()=>{
+            fs.removeSync(tempProjectDir);
+
+            if(stubExec.restore)
+                stubExec.restore();
+        });
+
+
+        it('should download basic template if project type is "basic"', function(done) {
+
+            stubExec.resolves(true);
+            ps.downloadTemplate("basic",tempProjectDir).then(()=>{
+
+                expect(stubExec).to.have.been.calledWith("npm install raappid/template-basic", tempProjectDir);
+
+                done();
+            });
+
+
+        });
+
+        it('should download the basic template for each projectType , if templateName is not given', function(done) {
+
+            stubExec.resolves(true);
+            ps.downloadTemplate("node-app",tempProjectDir).then(()=>{
+
+
+                expect(stubExec).to.have.been.calledWith("npm install raappid/template-node-app-basic", tempProjectDir);
+
+
+                ps.downloadTemplate("web-app",tempProjectDir).then(()=>{
+
+                    expect(stubExec).to.have.been.calledWith("npm install raappid/template-web-app-basic", tempProjectDir);
+
+
+
+                    ps.downloadTemplate("template",tempProjectDir).then(()=>{
+
+                        expect(stubExec).to.have.been.calledWith("npm install raappid/template-basic", tempProjectDir);
+                        done();
+                    });
+
+                });
+
+            });
+
+
+        });
+
+        it('should download the template to node_modules, if templateName is given', function(done) {
+
+            stubExec.restore();
+            ps.downloadTemplate("template",tempProjectDir,"raappid/template-basic").then(()=>{
+
+                try {
+                    var stats = fs.lstatSync(tempProjectDir+"/node_modules/template-basic");
+
+                    if (stats.isDirectory()) {
+                        done();
+                    }
+                }
+                catch (e) {
+
+                    done("Directory Should Have existed\n"+ e);
+                }
+            });
+
+        });
+
+
+        it('should reject with error if there was issue with downloading remote template', (done)=> {
+
+            stubExec.rejects(new Error("yay"));
+            ps.downloadTemplate("template",tempProjectDir,"raappid/sdfsgdg").then(null,(error)=>{
+
+                expect(error).to.be.instanceOf(Error);
+                expect(error.message).to.equal("yay");
+                done();
+            });
+
+
+        });
+
+    });
+
+    describe('installDependencies', () => {
+
+
+        var tempProjectDir:string = path.resolve("./test/tempProject");
+        var stubExec:any;
+        beforeEach((done)=>{
+
+            stubExec = sinon.stub(shell,"exec");
+            fs.mkdirs(tempProjectDir, function (err) {
+                fs.writeFileSync(tempProjectDir+"/package.json",JSON.stringify({version:"0.0.1"}, null, '  ') + '\n');
                 fs.mkdirsSync(tempProjectDir+"/scripts");
                 done();
             })
@@ -85,199 +188,89 @@ describe('project-service Test cases', () => {
         afterEach(()=>{
             fs.removeSync(tempProjectDir);
 
-            if(spyExec.restore)
-                spyExec.restore();
+            if(stubExec.restore)
+                stubExec.restore();
         });
 
 
-        it('should do npm install if no install.js is present in the scripts folder', function(done) {
+        it('should do npm install', function(done) {
 
-            ps.initializeProject(tempProjectDir).then((result)=>{
+            stubExec.resolves(true);
 
-                try {
-                    var stats = fs.lstatSync(tempProjectDir+"/node_modules");
+            ps.installDependencies(tempProjectDir).then((result)=>{
 
-                    // Is it a directory?
-                    if (stats.isDirectory()) {
-                        done();
-                    }
-                }
-                catch (e) {
+                expect(stubExec).to.have.calledWith("npm install",tempProjectDir);
+                done();
 
-                    done("Directory Should Have existed\n"+ e);
-                }
+            });
+
+        });
+
+
+        it('should reject with error if npm install throws error', function(done) {
+
+            stubExec.withArgs("npm install",tempProjectDir).rejects(new Error("humm"));
+            ps.installDependencies(tempProjectDir).then((result)=>{
+                done("Should never have passed\n");
 
             },(error)=>{
 
-                done("Should never have thrown error\n");
+                expect(error).to.be.instanceOf(Error);
+                expect(error.message).to.equal("humm");
+                done();
             });
-
-
-
         });
 
         it('should run the install.js if it is present in the scripts folder', function(done) {
 
             fs.writeFileSync(tempProjectDir +"/scripts/install.js",
                 `
-                 var fs = require("fs");
-                 fs.writeFileSync("temp.text");
-                `);
-
-            ps.initializeProject(tempProjectDir).then((result)=>{
-
-                try {
-                    var stats = fs.lstatSync(tempProjectDir+"/temp.text");
-
-                    if (stats.isFile()) {
-                        done();
-                    }
-                    else
-                    {
-                        done("File Should Have existed\n")
-                    }
-                }
-                catch (e) {
-
-                    done("File Should Have existed\n"+ e);
-                }
-            },(error)=>{
-
-                done("Should never have thrown error\n" + error);
-            });
-
-        });
-
-        it('should  do npm install if install script is run but did not do npm install', function(done) {
-
-            fs.writeFileSync(tempProjectDir +"/scripts/install.js",
-                `
                  console.log('yay')
                 `);
+            stubExec.resolves(true);
+            ps.installDependencies(tempProjectDir).then((result)=> {
 
-            ps.initializeProject(tempProjectDir).then((result)=>{
 
-                try {
-                    var stats = fs.lstatSync(tempProjectDir+"/node_modules");
-
-                    if (stats.isDirectory()) {
-                        done();
-                    }
-                }
-                catch (e) {
-
-                    done("Directory Should Have existed\n"+ e);
-                }
-
-            },(error)=>{
-
-                done("Should never have thrown error\n" + error);
+                expect(stubExec).to.have.been.calledWith("node " + tempProjectDir + "/scripts/install.js", tempProjectDir);
+                done();
             });
 
         });
 
-        it('should not do npm install if install script is run, which also ran npm install', function(done) {
+        it('should resolve to true if install.js was not found', function(done) {
 
+            stubExec.resolves(true);
 
-
-            fs.writeFileSync(tempProjectDir +"/scripts/install.js",`
-             var execSync = require('child_process').execSync;
-
-             execSync("npm install");
-
-             console.log('yay');
-
-             process.exit(0)
-            `);
-
-            ps.initializeProject(tempProjectDir).then((result)=>{
-
-                expect(spyExec).to.have.been.calledOnce;
-
-                try {
-                    var stats = fs.lstatSync(tempProjectDir+"/node_modules");
-
-                    if (stats.isDirectory()) {
-                        done();
-                    }
-                }
-                catch (e) {
-
-                    done("Directory Should Have existed\n"+ e);
-                }
+            ps.installDependencies(tempProjectDir).then((result)=>{
+                expect(result).to.be.true;
+                done();
 
             },(error)=>{
-
-                done("Should never have thrown error\n");
+                done("Should not have been rejected\n");
             });
         });
 
         it('should reject with error if install.js script has error', function(done) {
 
-            fs.writeFileSync(tempProjectDir +"/scripts/install.js",`
-             var execSync = require('child_process').execSync;
+            stubExec.onCall(0).resolves(true);
+            stubExec.onCall(1).rejects(new Error("humm"));
 
-             execSync("node eertetet");
-
-             process.exit(0)
-            `);
-
-            ps.initializeProject(tempProjectDir).then((result)=>{
-
-
-                done("Should never have passed\n");
-
-            },(error)=>{
-
-                expect(spyExec).to.have.been.calledOnce;
-                expect(error).to.be.instanceOf(Error);
-                done();
-            });
-        });
-
-        it('should reject with error if no install script was found and npm install throws error', function(done) {
-
-            spyExec.restore();
-            var shellStub:any = sinon.stub(shell,"exec");
-            shellStub.rejects(new Error("humm"));
-
-            ps.initializeProject(tempProjectDir).then((result)=>{
-
-                shellStub.restore();
-                done("Should never have passed\n");
-
-            },(error)=>{
-
-                expect(shellStub).to.have.been.calledOnce;
-                expect(error).to.be.instanceOf(Error);
-                shellStub.restore();
-                done();
-            });
-        });
-
-        it('should reject with error if install script was found and npm install throws error', function(done) {
-
-            spyExec.restore();
-            var shellStub:any = sinon.stub(shell,"exec");
-            shellStub.onCall(0).resolves(true);
-            shellStub.onCall(1).rejects(new Error("humm"));
             fs.writeFileSync(tempProjectDir +"/scripts/install.js",
                 `
                  console.log('yay')
                 `);
 
-            ps.initializeProject(tempProjectDir).then((result)=>{
-                shellStub.restore();
+            ps.installDependencies(tempProjectDir).then((result)=>{
                 done("Should never have passed\n");
 
             },(error)=>{
 
-                expect(shellStub).to.have.been.calledTwice;
                 expect(error).to.be.instanceOf(Error);
-                shellStub.restore();
+                expect(error.message).to.equal("humm");
                 done();
             });
         });
+
 
     });
 

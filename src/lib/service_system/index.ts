@@ -1,11 +1,13 @@
 
 
-import {IActionControl} from "../interfaces/comm_system/IActionControl";
+//importing managers
+import pm = require("./managers/project-manager");
 
-export function configure(actionControl:IActionControl):void
-{
 
-}
+var managers = {pm:require("./managers/project-manager"),
+
+};
+
 
 export class Action
 {
