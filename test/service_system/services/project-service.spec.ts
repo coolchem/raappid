@@ -19,12 +19,9 @@ describe('project-service Test cases', () => {
 
     describe('validateProjectType', () => {
 
-        it('should return error if not a valid project type', function(done) {
+        it('should return false if not a valid project type', function(done) {
 
-            var valid:boolean|Error = ps.validateProjectType("sdfgh");
-
-            expect(valid).to.be.instanceOf(Error);
-            expect((valid as Error).message).to.equal(ps.ERROR_INVALID_PROJECT_TYPE);
+            expect( ps.validateProjectType("sdfgh")).to.be.false;
             done();
 
         });
@@ -43,17 +40,10 @@ describe('project-service Test cases', () => {
 
     describe('validateProjectName', () => {
 
-        it('should return Error if not a valid project name', function(done) {
+        it('should return false if not a valid project name', function(done) {
 
-            var valid:boolean|Error = ps.validateProjectName("sdf?gh");
-
-            expect(valid).to.be.instanceOf(Error);
-            expect((valid as Error).message).to.equal(ps.ERROR_INVALID_PROJECT_NAME);
-
-            valid = ps.validateProjectName("sdf gh");
-
-            expect(valid).to.be.instanceOf(Error);
-            expect((valid as Error).message).to.equal(ps.ERROR_INVALID_PROJECT_NAME);
+            expect(ps.validateProjectName("sdf?gh")).to.be.false;
+            expect(ps.validateProjectName("sdf gh")).to.be.false;
 
             done();
 
@@ -135,6 +125,7 @@ describe('project-service Test cases', () => {
 
         it('should download the template to node_modules, if templateName is given', function(done) {
 
+            this.timeout(10000);
             stubExec.restore();
             ps.downloadTemplate("template",tempProjectDir,"raappid/template-basic").then(()=>{
 

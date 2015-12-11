@@ -42,8 +42,6 @@ export function cloneGitRepository(username:string,repoName:string,dirToCloneInt
 
 export function createRemoteRepository(username:string,password:string,repoName:string):Promise<any>
 {
-
-
     return new Promise((resolve,reject)=>{
 
         github.authenticate({

@@ -10,10 +10,32 @@ import SinonStub = Sinon.SinonStub;
 import SinonSpy = Sinon.SinonSpy;
 import ErrnoException = NodeJS.ErrnoException;
 
+
 var which = require("which");
 
 chai.use(require("sinon-chai"));
 require('sinon-as-promised');
+
+function loadEnv():void
+{
+    var doc;
+
+    try {
+        doc = fs.readFileSync(process.cwd() + "/.env").toString().split('\n');
+    } catch (exc) {
+        return;
+    }
+
+    var i = -1;
+    var len = doc.length;
+    var row;
+
+    while (++i < len) {
+        if (!doc[i]) continue;
+        row = doc[i].split(/\s*=\s*/);
+        process.env[row.shift()] = row.join('=').replace(/['"]/g, '');
+    }
+}
 
 
 describe('repo-service Test cases', () => {
@@ -198,7 +220,8 @@ describe('repo-service Test cases', () => {
         });
         afterEach(function () {
             spy.restore();
-            stub.restore();
+            if(stub.restore)
+                stub.restore();
         });
 
         it('should authenticate github, with the username and password given', function(done) {
@@ -215,7 +238,7 @@ describe('repo-service Test cases', () => {
 
         });
 
-        it('should resolves with result of the create repo with', function(done) {
+        it('should resolve with result of the create repo with', function(done) {
 
             stub.yields(null,"yay");
             repoService.createRemoteRepository("test","test","test").then((result)=>{
@@ -243,6 +266,35 @@ describe('repo-service Test cases', () => {
                 done();
 
             });
+
+        });
+
+        it('should create the remote repository', function(done) {
+
+            this.timeout(10000);
+            stub.restore();
+            loadEnv();
+            if(process.env.TEST_GITHUB)
+            {
+                var user:string[] = process.env.TEST_GITHUB.split(':');
+
+                repoService.createRemoteRepository(user[0],user[1],"test").then((result)=>{
+
+                    repoService.github.repos.delete({user:user[0],repo:"test"},()=>{
+                        done();
+                    })
+
+                },(error)=>{
+
+                    done(error);
+
+                });
+            }
+            else
+            {
+                done()
+            }
+
 
         });
 
