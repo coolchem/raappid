@@ -9,3 +9,4 @@ src/typings
 coverage
 dist
 npm-debug.log
+.env
