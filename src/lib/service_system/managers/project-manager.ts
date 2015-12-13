@@ -72,16 +72,6 @@ function askToReEnterCredentials():Promise<{username:string,password:string}>
    return askCredentials();
 }
 
-function askToCreateLocalGit():Promise<boolean>
-{
-    cliService.logError(ERROR_CREATING_REPO_BAD_CREDENTIALS);
-    cliService.log(MESSAGE_RE_ENTER_CREDENTIALS);
-
-    return null;
-}
-
-
-
 export function validate(projectType:string,projectName:string):Promise<boolean>
 {
 
@@ -120,7 +110,6 @@ export function createRemoteRepository(projectName:string):Promise<boolean>
 
             if(result)
             {
-
                 askCredentials().then((result)=>{
 
                     repoService.createRemoteRepository(result.username,result.password,projectName).then(()=>{
@@ -166,23 +155,30 @@ export function createRemoteRepository(projectName:string):Promise<boolean>
 export function createProjectDirectory(projectName:string,remoteRepo?:{username:string,repo:string}):Promise<boolean>
 {
 
-    //if remoteRepo
-        // clone repo
+    if(remoteRepo)
+        return repoService.cloneGitRepository(remoteRepo.username,remoteRepo.repo,process.cwd())
 
-    //if no remoteRepo
-        //create project directory
-        // do git init
 
-    return null;
+    return new Promise((resolve)=>{
+
+        var projectDir:string = process.cwd()+"/"+projectName;
+        fs.mkdirsSync(projectDir);
+
+        repoService.initializeGit(projectDir).then(()=>{
+            resolve(true);
+        });
+
+    });
 }
-export function copyTemplate(projectDirectory:string,templateName:string):Promise<any>
+export function copyTemplate(projectType:string,projectDirectory:string,templateName:string):Promise<any>
 {
 
-    //download template
+    return ps.downloadTemplate(projectType,projectDirectory,templateName).then((templatePath:string)=>{
 
-    // copy template contents into directory
+        fs.copySync(templatePath,projectDirectory);
 
-    return null;
+        return true;
+    });
 }
 
 

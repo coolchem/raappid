@@ -1,11 +1,11 @@
-/// <reference path="../../../src/typings/tsd.d.ts" />
+/// <reference path="../../../../src/typings/tsd.d.ts" />
 
 import chai = require('chai');
 import sinon = require('sinon');
-import ps =require("../../../src/lib/service_system/services/project-service");
+import ps =require("../../../../src/lib/service_system/services/project-service");
 import path = require("path");
 import fs = require("fs-extra");
-import shell = require("../../../src/lib/service_system/utils/shell-util")
+import shell = require("../../../../src/lib/service_system/utils/shell-util")
 import SinonStub = Sinon.SinonStub;
 import SinonSpy = Sinon.SinonSpy;
 
@@ -122,28 +122,6 @@ describe('project-service Test cases', () => {
 
 
         });
-
-        it('should download the template to node_modules, if templateName is given', function(done) {
-
-            this.timeout(10000);
-            stubExec.restore();
-            ps.downloadTemplate("template",tempProjectDir,"raappid/template-basic").then(()=>{
-
-                try {
-                    var stats = fs.lstatSync(tempProjectDir+"/node_modules/template-basic");
-
-                    if (stats.isDirectory()) {
-                        done();
-                    }
-                }
-                catch (e) {
-
-                    done("Directory Should Have existed\n"+ e);
-                }
-            });
-
-        });
-
 
         it('should reject with error if there was issue with downloading remote template', (done)=> {
 

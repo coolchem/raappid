@@ -1,11 +1,11 @@
-/// <reference path="../../../src/typings/tsd.d.ts" />
+/// <reference path="../../../../src/typings/tsd.d.ts" />
 
 import chai = require('chai');
 import sinon = require('sinon');
-import repoService = require("../../../src/lib/service_system/services/repo-service");
+import repoService = require("../../../../src/lib/service_system/services/repo-service");
 import path = require("path");
 import fs = require("fs-extra");
-import shell = require("../../../src/lib/service_system/utils/shell-util");
+import shell = require("../../../../src/lib/service_system/utils/shell-util");
 import SinonStub = Sinon.SinonStub;
 import SinonSpy = Sinon.SinonSpy;
 import ErrnoException = NodeJS.ErrnoException;
@@ -206,37 +206,6 @@ describe('repo-service Test cases', () => {
 
             })
         });
-
-        it('should do git clone into provided project directory', function(done) {
-
-            shellStub.restore();
-            this.timeout(10000);
-            var tempDir:string = path.resolve("./test/tempProject");
-            fs.mkdirsSync(tempDir);
-
-            repoService.cloneGitRepository("raappid","template-basic",tempDir).then(()=>{
-                try {
-                    // Query the entry
-                    var stats = fs.lstatSync(tempDir+"/template-basic");
-
-                    // Is it a directory?
-                    if (stats.isDirectory()) {
-                        done();
-                    }
-                    else
-                    {
-                        done(new Error("Directory should have been created"))
-                    }
-                }
-                catch (e) {
-
-                    done(new Error("Directory should have been created"));
-                }
-                fs.removeSync(tempDir);
-            })
-
-        });
-
     });
 
 
@@ -296,35 +265,6 @@ describe('repo-service Test cases', () => {
                 done();
 
             });
-
-        });
-
-        it('should create the remote repository', function(done) {
-
-            this.timeout(10000);
-            stub.restore();
-            loadEnv();
-            if(process.env.TEST_GITHUB)
-            {
-                var user:string[] = process.env.TEST_GITHUB.split(':');
-
-                repoService.createRemoteRepository(user[0],user[1],"test").then((result)=>{
-
-                    repoService.github.repos.delete({user:user[0],repo:"test"},()=>{
-                        done();
-                    })
-
-                },(error)=>{
-
-                    done(error);
-
-                });
-            }
-            else
-            {
-                done()
-            }
-
 
         });
 

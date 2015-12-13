@@ -15,7 +15,8 @@ export function validateGit():boolean
 {
     try
     {
-        return which.sync("git");
+        which.sync("git");
+        return true;
     }
     catch (e)
     {

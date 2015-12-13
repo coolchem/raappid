@@ -1,9 +1,9 @@
-/// <reference path="../../../src/typings/tsd.d.ts" />
+/// <reference path="../../../../src/typings/tsd.d.ts" />
 
 import chai = require('chai');
 import sinon = require('sinon');
 import chalk = require('chalk');
-import cliService =require("../../../src/lib/service_system/services/cli-service");
+import cliService =require("../../../../src/lib/service_system/services/cli-service");
 
 chalk.enabled = true;
 

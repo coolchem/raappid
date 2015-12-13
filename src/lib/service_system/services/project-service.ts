@@ -22,7 +22,7 @@ export function validateProjectName(name:string):boolean
     return !rx.test(name);
 }
 
-export function downloadTemplate(projectType:string,projectDirectoryPath:string,templateName?:string):Promise<boolean>
+export function downloadTemplate(projectType:string,projectDirectoryPath:string,templateName?:string):Promise<string>
 {
 
     var cmd:string = "npm install ";
@@ -52,7 +52,16 @@ export function downloadTemplate(projectType:string,projectDirectoryPath:string,
         }
     }
 
-    return shell.exec(cmd,projectDirectoryPath);
+    return new Promise((resolve,reject)=>{
+
+        shell.exec(cmd,projectDirectoryPath).then(()=>{
+
+            resolve(projectDirectoryPath+"/node_modules"+templateName)
+        },(error)=>{
+            reject(error);
+        })
+    });
+
 }
 
 export function installDependencies(projectDirectoryPath:string):Promise<boolean>

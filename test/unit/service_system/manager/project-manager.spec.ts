@@ -1,15 +1,15 @@
-/// <reference path="../../../src/typings/tsd.d.ts" />
+/// <reference path="../../../../src/typings/tsd.d.ts" />
 
 import chai = require('chai');
 import sinon = require('sinon');
-import ps =require("../../../src/lib/service_system/services/project-service");
-import repoService = require("../../../src/lib/service_system/services/repo-service");
+import ps =require("../../../../src/lib/service_system/services/project-service");
+import repoService = require("../../../../src/lib/service_system/services/repo-service");
 import path = require("path");
 import fs = require("fs-extra");
-import shell = require("../../../src/lib/service_system/utils/shell-util");
-import cliService = require("../../../src/lib/service_system/services/cli-service")
+import shell = require("../../../../src/lib/service_system/utils/shell-util");
+import cliService = require("../../../../src/lib/service_system/services/cli-service")
 
-import pm = require("../../../src/lib/service_system/managers/project-manager");
+import pm = require("../../../../src/lib/service_system/managers/project-manager");
 
 
 import SinonStub = Sinon.SinonStub;
@@ -147,41 +147,80 @@ describe('project-manager Test cases', () => {
 
         });
 
-/*        it('should confirm with user to create local git if credentials fail second time', function(done) {
 
-            askStub.withArgs("Enter username").resolves("test");
-            askStub.withArgs("Enter passoword").resolves("test");
+    });
 
-            confirmStub.withArgs(pm.MESSAGE_CONTINUE_WITH_LOCAL_GIT_REPO.replace("#repo-type","github")).resolves(false);
-            pm.createRemoteRepository("humm").then((result)=>{
-                expect(logErrorSpy).to.have.been.calledWith(pm.ERROR_CREATING_REPO_BAD_CREDENTIALS.replace("#repo-type","github")).calledTwice;
-                expect(logSpy).to.have.been.calledWith(pm.MESSAGE_RE_ENTER_CREDENTIALS).calledOnce;
-                expect(logSpy).to.have.been.calledWith(pm.MESSAGE_CONTINUE_WITH_LOCAL_GIT_REPO.replace("#repo-type","github")).calledOnce;
+    describe("createProjectDirectory",()=>{
+
+        var cloneStub:any;
+        var mkdirStub:SinonStub;
+        var gitInitStub:any;
+
+        beforeEach(()=>{
+            cloneStub = sinon.stub(repoService,"cloneGitRepository");
+            mkdirStub = sinon.stub(fs,"mkdirsSync");
+            gitInitStub = sinon.stub(repoService,"initializeGit");
+        });
+
+        afterEach(()=>{
+            cloneStub.restore();
+            mkdirStub.restore();
+            gitInitStub.restore();
+        });
+
+        it("should clone repository if remoteRepo is given",(done)=>{
+
+            cloneStub.resolves(true);
+            pm.createProjectDirectory("test",{username:"test",repo:"test"}).then(()=>{
+
+                expect(cloneStub).to.have.been.calledWith("test","test",process.cwd());
                 done();
             });
 
+        });
 
-        });*/
+        it("should create directory with project name and do git init, if remote repo is not present",(done)=>{
 
-/*       it('should confirm with user to create local git if there was any issue besides bad credentials with creating repo', function(done) {
 
-            askStub.withArgs("Enter username").resolves("test");
-            askStub.withArgs("Enter passoword").resolves("test");
+            mkdirStub.returns(null);
+            gitInitStub.resolves(true);
+            pm.createProjectDirectory("test").then(()=>{
 
-            var repoStub:any = sinon.stub(repoService,"createRemoteRepository");
-            repoStub.rejects(new Error("yay"));
+                expect(mkdirStub).to.have.been.calledWith(process.cwd()+"/test");
+                done();
+            });
+        })
 
-            confirmStub.withArgs(pm.MESSAGE_CONTINUE_WITH_LOCAL_GIT_REPO.replace("#repo-type","github")).resolves(false);
 
-            pm.createRemoteRepository("humm").then((result)=>{
+    });
 
-                expect(logErrorSpy).to.not.have.been.calledWith(pm.ERROR_CREATING_REPO_BAD_CREDENTIALS.replace("#repo-type","github"));
-                expect(logSpy).to.not.have.been.calledWith(pm.MESSAGE_RE_ENTER_CREDENTIALS);
-                expect(logSpy).to.have.been.calledWith(pm.MESSAGE_CONTINUE_WITH_LOCAL_GIT_REPO.replace("#repo-type","github")).calledOnce;
+    describe("copyTemplate",()=>{
+
+        var downloadStub:any;
+        var copyStub:SinonStub;
+
+        beforeEach(()=>{
+            downloadStub = sinon.stub(ps,"downloadTemplate");
+            copyStub = sinon.stub(fs,"copySync");
+        });
+
+        afterEach(()=>{
+            downloadStub.restore();
+            copyStub.restore();
+        });
+
+        it("should download template and return template path",(done)=>{
+
+            downloadStub.resolves("testTemplatePath");
+            copyStub.returns(null);
+            pm.copyTemplate("node-app","test","testTemplate").then(()=>{
+
+                expect(downloadStub).to.have.been.calledWith("node-app","test","testTemplate");
+                expect(copyStub).to.have.been.calledWith("testTemplatePath");
                 done();
             });
 
-        });*/
+        });
 
 
     });

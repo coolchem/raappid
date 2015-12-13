@@ -1,8 +1,8 @@
-/// <reference path="../../../src/typings/tsd.d.ts" />
+/// <reference path="../../../../src/typings/tsd.d.ts" />
 
 import chai = require('chai');
 import sinon = require('sinon');
-import shell =require("../../../src/lib/service_system/utils/shell-util");
+import shell =require("../../../../src/lib/service_system/utils/shell-util");
 import fs = require("fs-extra");
 import path = require("path");
 
