@@ -92,10 +92,10 @@ describe('repo-service Integration Tests', () => {
             var tempDir:string = path.resolve("./test/tempProject");
             fs.mkdirsSync(tempDir);
 
-            repoService.cloneGitRepository("raappid","template-basic",tempDir).then(()=>{
+            repoService.cloneGitRepository("raappid","test-cloning",tempDir).then(()=>{
                 try {
                     // Query the entry
-                    var stats = fs.lstatSync(tempDir+"/template-basic");
+                    var stats = fs.lstatSync(tempDir+"/test-cloning");
 
                     // Is it a directory?
                     if (stats.isDirectory()) {
