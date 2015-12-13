@@ -184,7 +184,7 @@ describe('repo-service Test cases', () => {
 
             repoService.cloneGitRepository("test","test","testDir").then(()=>{
 
-                expect(shellStub).to.have.been.calledWith("git clone git@github.com:test/test","testDir");
+                expect(shellStub).to.have.been.calledWith("git clone https://github.com/test/test.git","testDir");
 
                 done();
 
@@ -199,7 +199,7 @@ describe('repo-service Test cases', () => {
 
             repoService.cloneGitRepository("test","test","testDir").then(null,(error)=>{
 
-                expect(shellStub).to.have.been.calledWith("git clone git@github.com:test/test","testDir");
+                expect(shellStub).to.have.been.calledWith("git clone https://github.com/test/test.git","testDir");
                 expect(error).to.be.instanceOf(Error);
                 expect(error.message).to.equal("yay");
                 done();

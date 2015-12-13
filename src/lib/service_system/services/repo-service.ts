@@ -40,7 +40,8 @@ export function addAllFilesAndCommit(commitMessage:string,projectDirectory:strin
 export function cloneGitRepository(username:string,repoName:string,dirToCloneInto:string):Promise<boolean>
 {
 
-    var cmd:string = "git clone git@github.com:" +username+"/"+repoName;
+    //https://github.com/raappid/template-basic.git
+    var cmd:string = "git clone https://github.com/" +username+"/"+repoName+".git";
     return shell.exec(cmd,dirToCloneInto);
 }
 
