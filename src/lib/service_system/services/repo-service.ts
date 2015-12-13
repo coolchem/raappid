@@ -1,5 +1,9 @@
 
-import shell = require("../utils/shell-util")
+/// <reference path="../../../typings/tsd.d.ts" />
+
+import shell = require("../utils/shell-util");
+
+
 var which = require("which");
 var GitHubApi = require("github");
 export var github = new GitHubApi({
@@ -11,7 +15,7 @@ export function validateGit():boolean
 {
     try
     {
-        return which("git");
+        return which.sync("git");
     }
     catch (e)
     {

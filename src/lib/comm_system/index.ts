@@ -1,4 +1,8 @@
 
+import {IActionControl} from "../interfaces/comm_system/IActionControl";
+
+export var actionControl:IActionControl = require("./action-control");
+
 export class Errors{
     static ERROR_REGISTERING_ACTION_NAME_NOT_TYPE_STRING:string = "Error registering action: The action name should be of type string";
     static ERROR_REGISTERING_ACTION_HANDLER_NOT_TYPE_FUNCTION:string = "Error registering action: The handler should be of type function";

@@ -56,7 +56,7 @@ describe('repo-service Test cases', () => {
 
         it('should return false if git not installed', function() {
 
-            whichStub.returns(new Error("no git"));
+            whichStub.throws(new Error("no git"));
             expect(repoService.validateGit()).to.be.false;
         });
 
@@ -64,7 +64,7 @@ describe('repo-service Test cases', () => {
         it('should return true is git installed', function() {
 
             whichStub.returns(true);
-            expect(repoService.validateGit()).to.be.false;
+            expect(repoService.validateGit()).to.be.true;
         });
 
     });
@@ -207,6 +207,36 @@ describe('repo-service Test cases', () => {
             })
         });
 
+        it('should do git clone into provided project directory', function(done) {
+
+            shellStub.restore();
+            this.timeout(10000);
+            var tempDir:string = path.resolve("./test/tempProject");
+            fs.mkdirsSync(tempDir);
+
+            repoService.cloneGitRepository("raappid","template-basic",tempDir).then(()=>{
+                try {
+                    // Query the entry
+                    var stats = fs.lstatSync(tempDir+"/template-basic");
+
+                    // Is it a directory?
+                    if (stats.isDirectory()) {
+                        done();
+                    }
+                    else
+                    {
+                        done(new Error("Directory should have been created"))
+                    }
+                }
+                catch (e) {
+
+                    done(new Error("Directory should have been created"));
+                }
+                fs.removeSync(tempDir);
+            })
+
+        });
+
     });
 
 
@@ -227,7 +257,7 @@ describe('repo-service Test cases', () => {
         it('should authenticate github, with the username and password given', function(done) {
 
 
-            repoService.createRemoteRepository("test","test","test");
+            repoService.createRemoteRepository("test","test","test").then();
 
             expect(spy).to.have.been.calledWith({
                 type: "basic",
