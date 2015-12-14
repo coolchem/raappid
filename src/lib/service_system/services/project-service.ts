@@ -97,4 +97,31 @@ export function installDependencies(projectDirectoryPath:string):Promise<boolean
 
 }
 
+export function sanitizePackageJson(projectName:string, projectDirectory:string):any
+{
+    var pkg:any = JSON.parse(fs.readFileSync(projectDirectory+"/package.json", 'utf8'));
+
+    var newPackage:any = {};
+
+    for (var key in pkg)
+    {
+        if(key.indexOf("_") !== 0 && key.toLowerCase() !== "githead")
+        {
+            newPackage[key] = pkg[key];
+        }
+    }
+    newPackage.name = projectName;
+    newPackage.description = "";
+    newPackage.version = "0.0.1";
+    newPackage.author = {name:""};
+    newPackage.bugs = {url:""};
+    newPackage.repository = {url:"",type:""};
+    newPackage.licenses = [];
+    newPackage.keywords = [];
+
+    fs.writeFileSync(projectDirectory+"/package.json",JSON.stringify(newPackage, null, '  ') + '\n');
+    return newPackage;
+}
+
+
 

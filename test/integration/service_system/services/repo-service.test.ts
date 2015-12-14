@@ -88,7 +88,7 @@ describe('repo-service Integration Tests', () => {
 
         it('should do git clone into provided project directory', function(done) {
 
-            this.timeout(10000);
+            this.timeout(30000);
             var tempDir:string = path.resolve("./test/tempProject");
             fs.mkdirsSync(tempDir);
 
@@ -123,7 +123,7 @@ describe('repo-service Integration Tests', () => {
 
         it('should create the remote repository', function(done) {
 
-            this.timeout(10000);
+            this.timeout(30000);
             loadEnv();
             if(process.env.TEST_GITHUB)
             {

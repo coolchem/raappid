@@ -182,17 +182,13 @@ export function copyTemplate(projectType:string,projectDirectory:string,template
 }
 
 
-export function initializeProject(projectDirectory:string,doPush:boolean = true):Promise<any>
+export function initializeProject(projectName:string,projectDirectory:string):Promise<any>
 {
     //update package.json
 
-    //commit
+    ps.sanitizePackageJson(projectName,projectDirectory);
 
-    //if do push
-      //push
-
-    //install dependencies
-    return null;
+    return ps.installDependencies(projectDirectory);
 }
 
 

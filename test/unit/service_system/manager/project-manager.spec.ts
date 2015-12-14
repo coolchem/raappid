@@ -225,6 +225,60 @@ describe('project-manager Test cases', () => {
 
     });
 
+    describe("initializeProject",()=>{
+
+        var sanitizeStub:any;
+        var instalDepsStup:any;
+
+        beforeEach(()=>{
+            sanitizeStub = sinon.stub(ps,"sanitizePackageJson");
+            instalDepsStup = sinon.stub(ps,"installDependencies");
+        });
+
+        afterEach(()=>{
+            sanitizeStub.restore();
+            instalDepsStup.restore();
+        });
+
+        it("should sanitize the package.json",(done)=>{
+
+            sanitizeStub.returns({});
+            instalDepsStup.resolves(true);
+            pm.initializeProject("test","testDirectory").then(()=>{
+
+                expect(sanitizeStub).to.have.been.calledWith("test","testDirectory").calledOnce;
+                done()
+            });
+
+        });
+
+        it("should install project dependencies",(done)=>{
+
+            sanitizeStub.returns({});
+            instalDepsStup.resolves(true);
+            pm.initializeProject("test","testDirectory").then(()=>{
+
+                expect(instalDepsStup).to.have.been.calledWith("testDirectory").calledOnce;
+                done();
+            });
+        });
+
+
+        it("should reject with error if any issue with installing dependencies",(done)=>{
+
+            sanitizeStub.returns({});
+            instalDepsStup.rejects(new Error("yay"));
+            pm.initializeProject("test","testDirectory").then(null,(error)=>{
+
+                expect(error).to.be.instanceOf(Error);
+                expect(error.message).to.equal("yay");
+                done()
+            });
+        });
+
+
+    });
+
 });
 
 
