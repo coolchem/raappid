@@ -32,15 +32,22 @@ export function createProjectCLI(projectType:string,projectName:string,templateN
 
         var projectDirectory:string;
         var summary:string[] = [];
+        cliService.warn("Validating...");
         pa.validate(projectType,projectName)
             .then(()=>{
+                cliService.logSuccess("Validation Complete.");
+
+                cliService.warn("Creating Remote Repository...");
                 return pa.createRemoteRepository(projectName);
             },doRejection)
             .then((result)=>{
 
+
                 var remoteRepo:{username:string,repo:string};
                 if(result)
                 {
+                    cliService.logSuccess("Creating Remote repository complete.");
+
                     remoteRepo = {username:result as string,repo:projectName}
                 }
                 continueCreatingProjectDir(remoteRepo)
@@ -62,21 +69,29 @@ export function createProjectCLI(projectType:string,projectName:string,templateN
 
         function continueCreatingProjectDir(remoteRepo?:{username:string,repo:string}):void
         {
+            cliService.warn("Creating project directory...");
+
             pa.createProjectDirectory(projectName,remoteRepo)
                 .then((projectDirectoryPath)=>{
 
+                    cliService.logSuccess("Project directory complete.");
+                    cliService.warn("Copying template...");
                     projectDirectory= projectDirectoryPath;
                     return pa.copyTemplate(projectType,projectDirectory,templateName);
                 },doRejection)
                 .then(()=>{
 
+                    cliService.logSuccess("Copying template completed.");
+                    cliService.warn("Initializing project...");
                     return pa.initializeProject(projectName,projectDirectory);
 
                 },doRejection)
                 .then(()=>{
 
+                    cliService.logSuccess("Project initialized.");
                     resolve(summary);
                 },(error)=>{
+                    cliService.logError(error.message);
                     resolve(summary);
                 });
         }
