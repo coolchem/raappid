@@ -4,12 +4,6 @@
 
 import cm = require("../../../../src/lib/service_system/managers/cli-manager");
 import chai = require('chai');
-import sinon = require('sinon');
-
-import cliService = require("../../../../src/lib/service_system/services/cli-service");
-
-chai.use(require("sinon-chai"));
-require('sinon-as-promised');
 
 describe('cli-manager Test cases', () => {
     var expect = chai.expect;

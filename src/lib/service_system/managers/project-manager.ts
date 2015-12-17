@@ -38,34 +38,35 @@ export function createProjectCLI(projectType:string,projectName:string,templateN
                 cliService.logSuccess("Validation Complete.");
 
                 cliService.warn("Creating Remote Repository...");
-                return pa.createRemoteRepository(projectName);
-            },doRejection)
-            .then((result)=>{
+
+                pa.createRemoteRepository(projectName)
+                    .then((result)=>{
 
 
-                var remoteRepo:{username:string,repo:string};
-                if(result)
-                {
-                    cliService.logSuccess("Creating Remote repository complete.");
-
-                    remoteRepo = {username:result as string,repo:projectName}
-                }
-                continueCreatingProjectDir(remoteRepo)
-
-            },(error)=>{
-
-                cliService.confirm(MESSAGE_CONTINUE_WITH_LOCAL_GIT_REPO.replace("#repo-type","GitHub"))
-                .then((result)=>{
+                    var remoteRepo:{username:string,repo:string};
                     if(result)
                     {
-                        continueCreatingProjectDir();
+                        cliService.logSuccess("Creating Remote repository complete.");
+
+                        remoteRepo = {username:result as string,repo:projectName}
                     }
-                    else
-                    {
-                        doRejection(new Error(ERROR_USER_CANCELED_CREATE_PROJECT));
-                    }
-                })
-            });
+                    continueCreatingProjectDir(remoteRepo)
+
+                },(error)=>{
+
+                    cliService.confirm(MESSAGE_CONTINUE_WITH_LOCAL_GIT_REPO.replace("#repo-type","GitHub"))
+                        .then((result)=>{
+                            if(result)
+                            {
+                                continueCreatingProjectDir();
+                            }
+                            else
+                            {
+                                doRejection(new Error(ERROR_USER_CANCELED_CREATE_PROJECT));
+                            }
+                        })
+                });
+            },doRejection);
 
         function continueCreatingProjectDir(remoteRepo?:{username:string,repo:string}):void
         {
@@ -77,23 +78,23 @@ export function createProjectCLI(projectType:string,projectName:string,templateN
                     cliService.logSuccess("Project directory complete.");
                     cliService.warn("Copying template...");
                     projectDirectory= projectDirectoryPath;
-                    return pa.copyTemplate(projectType,projectDirectory,templateName);
+                    pa.copyTemplate(projectType,projectDirectory,templateName)
+                        .then(()=>{
+
+                            cliService.logSuccess("Copying template completed.");
+                            cliService.warn("Initializing project...");
+
+                            pa.initializeProject(projectName,projectDirectory)
+                                .then(()=>{
+                                cliService.logSuccess("Project initialized.");
+                                resolve(summary);
+                            },(error)=>{
+                                cliService.logError(error.message);
+                                resolve(summary);
+                            });
+
+                        },doRejection);
                 },doRejection)
-                .then(()=>{
-
-                    cliService.logSuccess("Copying template completed.");
-                    cliService.warn("Initializing project...");
-                    return pa.initializeProject(projectName,projectDirectory);
-
-                },doRejection)
-                .then(()=>{
-
-                    cliService.logSuccess("Project initialized.");
-                    resolve(summary);
-                },(error)=>{
-                    cliService.logError(error.message);
-                    resolve(summary);
-                });
         }
     });
 

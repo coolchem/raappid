@@ -113,6 +113,11 @@ describe('project-service Test cases', () => {
                     ps.downloadTemplate("template",tempProjectDir).then(()=>{
 
                         expect(stubExec).to.have.been.calledWith("npm install raappid/template-basic", tempProjectDir);
+                    });
+
+                    ps.downloadTemplate("template",tempProjectDir,"").then(()=>{
+
+                        expect(stubExec).to.have.been.calledWith("npm install raappid/template-basic", tempProjectDir);
                         done();
                     });
 

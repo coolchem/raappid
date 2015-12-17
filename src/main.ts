@@ -1,6 +1,6 @@
 
 
 
-import lib = require("./lib");
+export * from "./lib/index";
 
 

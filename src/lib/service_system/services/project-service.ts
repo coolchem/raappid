@@ -22,7 +22,7 @@ export function validateProjectName(name:string):boolean
     return !rx.test(name);
 }
 
-export function downloadTemplate(projectType:string,projectDirectoryPath:string,templateName?:string):Promise<string>
+export function downloadTemplate(projectType:string,projectDirectoryPath:string,templateName:string = ""):Promise<string>
 {
 
     var cmd:string = "npm install ";
@@ -32,7 +32,7 @@ export function downloadTemplate(projectType:string,projectDirectoryPath:string,
         cmd += "raappid/template-basic"
     }
 
-    if(templateName)
+    if(templateName !="")
     {
         cmd += templateName;
     }
