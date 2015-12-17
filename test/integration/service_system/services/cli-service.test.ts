@@ -11,7 +11,7 @@ chai.use(require("sinon-chai"));
 
 var stdin = require('mock-stdin').stdin();
 
-describe('cli-service Test cases', () => {
+describe('cli-service Integration Tests', () => {
 
     var expect = chai.expect;
     var logSpy;

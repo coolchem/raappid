@@ -97,7 +97,7 @@ export function installDependencies(projectDirectoryPath:string):Promise<boolean
 
 }
 
-export function sanitizePackageJson(projectName:string, projectDirectory:string):any
+export function sanitizePackageJson(projectName:string, projectDirectory:string):Object
 {
     var pkg:any = JSON.parse(fs.readFileSync(projectDirectory+"/package.json", 'utf8'));
 

@@ -37,12 +37,12 @@ export function addAllFilesAndCommit(commitMessage:string,projectDirectory:strin
 }
 
 
-export function cloneGitRepository(username:string,repoName:string,dirToCloneInto:string):Promise<boolean>
+export function cloneGitRepository(username:string,repoName:string,dirToCloneInto:string):Promise<string>
 {
-
-    //https://github.com/raappid/template-basic.git
     var cmd:string = "git clone https://github.com/" +username+"/"+repoName+".git";
-    return shell.exec(cmd,dirToCloneInto);
+    return shell.exec(cmd,dirToCloneInto).then(()=>{
+        return dirToCloneInto+"/"+repoName
+    });
 }
 
 

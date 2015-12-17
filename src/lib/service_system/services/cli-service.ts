@@ -42,7 +42,7 @@ export function askInput(message:string):Promise<string>
     });
 }
 
-export function log(value:string,color?:string):void
+export function log(value:string,color?:string):string
 {
     if(color && color != "")
     {
@@ -56,20 +56,20 @@ export function log(value:string,color?:string):void
     }
 
     console.log(value);
-
+    return value;
 }
 
-export function warn(message:string):void
+export function warn(message:string):string
 {
-    log(message,"yellow");
+    return log(message,"yellow");
 }
 
-export function logError(message:string):void
+export function logError(message:string):string
 {
-    log(message,"red");
+    return log(message,"red");
 }
 
-export function logSuccess(message:string):void
+export function logSuccess(message:string):string
 {
-    log(message,"green");
+    return log(message,"green");
 }

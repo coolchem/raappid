@@ -9,7 +9,7 @@ import path = require("path");
 chai.use(require("sinon-chai"));
 
 
-describe('shell-util Test cases', () => {
+describe('shell-util Integration Tests', () => {
 
     var expect = chai.expect;
 
