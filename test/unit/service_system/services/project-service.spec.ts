@@ -62,10 +62,15 @@ describe('project-service Test cases', () => {
 
         var tempProjectDir:string = path.resolve("./test/tempProject");
         var stubExec;
+        var readdirSyncStub:any;
 
         beforeEach((done)=>{
 
             stubExec = sinon.stub(shell,"exec");
+            readdirSyncStub = sinon.stub(fs,"readdirSync");
+
+            readdirSyncStub.returns(["test"]);
+            stubExec.resolves(true);
             fs.mkdirs(tempProjectDir, function (err) {
                 fs.writeFileSync(tempProjectDir+"/package.json",JSON.stringify({version:"0.0.1",  devDependencies: {}}, null, '  ') + '\n');
 
@@ -77,8 +82,8 @@ describe('project-service Test cases', () => {
         afterEach(()=>{
             fs.removeSync(tempProjectDir);
 
-            if(stubExec.restore)
-                stubExec.restore();
+            readdirSyncStub.restore();
+            stubExec.restore();
         });
 
 
@@ -97,7 +102,6 @@ describe('project-service Test cases', () => {
 
         it('should download the basic template for each projectType , if templateName is not given', function(done) {
 
-            stubExec.resolves(true);
             ps.downloadTemplate("node-app",tempProjectDir).then(()=>{
 
 
@@ -123,6 +127,17 @@ describe('project-service Test cases', () => {
 
                 });
 
+            });
+
+
+        });
+
+        it('should download from remote template ', (done)=> {
+
+            ps.downloadTemplate("template",tempProjectDir,"raappid/sdfsgdg").then((result)=>{
+
+                expect(stubExec).to.have.been.calledWith("npm install raappid/sdfsgdg", tempProjectDir);
+                done();
             });
 
 

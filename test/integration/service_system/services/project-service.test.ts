@@ -37,11 +37,12 @@ describe('project-service Integration Tests', () => {
         it('should download the template to node_modules, if templateName is given', function(done) {
 
             this.timeout(30000);
-            ps.downloadTemplate("template",tempProjectDir,"raappid/template-basic").then(()=>{
+            ps.downloadTemplate("template",tempProjectDir,"raappid/template-basic").then((result)=>{
+
 
                 try {
                     var stats = fs.lstatSync(tempProjectDir+"/node_modules/template-basic");
-
+                    expect(result).to.equal(tempProjectDir+"/node_modules/template-basic");
                     if (stats.isDirectory()) {
                         done();
                     }

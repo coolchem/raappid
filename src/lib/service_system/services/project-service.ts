@@ -2,6 +2,7 @@
 
 import fs = require("fs-extra");
 import shell = require("../utils/shell-util");
+import path = require('path');
 
 var PROJECT_TYPE_BASIC:string = "basic";
 var PROJECT_TYPE_NODE:string = "node-app";
@@ -29,39 +30,46 @@ export function downloadTemplate(projectType:string,projectDirectoryPath:string,
 
     if(projectType == PROJECT_TYPE_BASIC)
     {
-        cmd += "raappid/template-basic"
+        templateName = "raappid/template-basic"
     }
 
-    if(templateName !="")
-    {
-        cmd += templateName;
-    }
-    else
+    if(templateName == "")
     {
         switch (projectType)
         {
             case PROJECT_TYPE_NODE:
-                cmd+="raappid/template-node-app-basic";
+                templateName ="raappid/template-node-app-basic";
                 break;
             case PROJECT_TYPE_WEB:
-                cmd+="raappid/template-web-app-basic";
+                templateName ="raappid/template-web-app-basic";
                 break;
             case PROJECT_TYPE_TEMPLATE:
-                cmd+="raappid/template-basic";
+                templateName ="raappid/template-basic";
                 break;
         }
     }
+
+    cmd += templateName;
 
     return new Promise((resolve,reject)=>{
 
         shell.exec(cmd,projectDirectoryPath).then(()=>{
 
-            resolve(projectDirectoryPath+"/node_modules"+templateName)
+            var templatePath:string = getTemplatePath(projectDirectoryPath);
+            resolve(templatePath);
         },(error)=>{
             reject(error);
         })
     });
 
+}
+
+function getTemplatePath(projectDirectoryPath:string):string
+{
+    var nodeModulesPath:string = projectDirectoryPath+"/node_modules";
+    var files = fs.readdirSync(nodeModulesPath);
+
+    return path.join(nodeModulesPath,files[0]);
 }
 
 export function installDependencies(projectDirectoryPath:string):Promise<boolean>
