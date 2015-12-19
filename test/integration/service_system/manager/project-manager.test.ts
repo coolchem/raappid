@@ -9,6 +9,7 @@ import shell = require("../../../../src/lib/service_system/utils/shell-util");
 import pa = require("../../../../src/lib/service_system/assistants/project-assistant");
 import SinonStub = Sinon.SinonStub;
 import SinonSpy = Sinon.SinonSpy;
+import {Stats} from "fs-extra";
 
 chai.use(require("sinon-chai"));
 require('sinon-as-promised');
@@ -20,7 +21,17 @@ describe('project-manager Integration Tests', () => {
     describe('createProjectCLI', () => {
 
 
-        it("should remove project directory, while rejecting with error",(done)=>{
+        afterEach(()=>{
+
+            try {
+                var stats:Stats = fs.lstatSync(process.cwd()+"/myProject");
+                fs.removeSync(process.cwd()+"/myProject");
+            }
+            catch (e) {
+
+            }
+        });
+        it("should remove project directory, while rejecting with error",function (done){
 
             var copyStub:any = sinon.stub(pa,"copyTemplate");
             copyStub.rejects(new Error("yay"));
@@ -39,6 +50,34 @@ describe('project-manager Integration Tests', () => {
 
             })
 
+
+        });
+
+        it("should successfully create project",function(done){
+
+            this.timeout(120000);
+
+            var createRemoteRepoStub:any = sinon.stub(pa,"createRemoteRepository");
+            createRemoteRepoStub.resolves(false);
+            pm.createProjectCLI("basic","myProject").then(()=>{
+
+                createRemoteRepoStub.restore();
+                try {
+                    var stats = fs.lstatSync(process.cwd()+"/myProject");
+                    if (stats.isDirectory()) {
+                        done();
+                    }
+                    else
+                    {
+                        done("Directory Should Have existed\n");
+                    }
+                }
+                catch (e) {
+
+                    done(e);
+                }
+
+            })
 
         })
     });

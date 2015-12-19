@@ -233,6 +233,7 @@ export function copyTemplate(projectType:string,projectDirectory:string,template
 
         fs.copySync(templatePath,projectDirectory);
 
+        fs.removeSync(templatePath);
         return true;
     });
 }

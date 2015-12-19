@@ -241,18 +241,23 @@ describe('project-assistant Test cases', () => {
         var downloadStub:any;
         var copyStub:SinonStub;
         var writeFileSyncStub:any;
+        var removeSyncStub:any;
 
         beforeEach(()=>{
             downloadStub = sinon.stub(ps,"downloadTemplate");
             copyStub = sinon.stub(fs,"copySync");
             writeFileSyncStub = sinon.stub(fs,"writeFileSync");
+            removeSyncStub = sinon.stub(fs,"removeSync");
+
             writeFileSyncStub.returns(true);
+            removeSyncStub.returns(true);
         });
 
         afterEach(()=>{
             downloadStub.restore();
             copyStub.restore();
             writeFileSyncStub.restore();
+            removeSyncStub.restore();
         });
 
         it("should download template and return template path",(done)=>{
