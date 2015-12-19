@@ -21,7 +21,16 @@ if you do not want to create the project, please answer No to below question.
 Would you like to continue creating the project as a local git repository?`;
 
 
+function logStep(message:string,isStaring:boolean = true):string
+{
+    if(isStaring)
+    {
+        return cliService.warn(message+"\n");
+    }
+    return cliService.logSuccess(message+"\n");
+}
 
+//todo: an effective refactor of the function below
 export function createProjectCLI(projectType:string,projectName:string,templateName?:string):Promise<string[]>{
 
 
@@ -42,6 +51,8 @@ export function createProjectCLI(projectType:string,projectName:string,templateN
             catch (e) {
                 //means project directory was not created
             }
+
+            cliService.logError(error.message);
             reject(error);
         }
 
@@ -50,12 +61,14 @@ export function createProjectCLI(projectType:string,projectName:string,templateN
             pa.createRemoteRepository(projectName).then((result:{username:string,repoName:string})=>{
                 if(!result)
                 {
+                    cliService.logSuccess("\nProject Created Successfully!!\n");
                     resolve(summary);
                 }
                 else
                 {
                     repoService.addRemoteOrigin(result.username,result.repoName,projectDirectory)
                     .then(()=>{
+                        cliService.logSuccess("\nProject Created Successfully!!\n");
                         resolve(summary);
                     });
                 }
@@ -65,33 +78,33 @@ export function createProjectCLI(projectType:string,projectName:string,templateN
         }
 
 
-        cliService.warn("Validating...");
+        logStep("Validating...");
 
         pa.validate(projectType,projectName)
             .then(()=>{
-                cliService.logSuccess("Validation Complete.");
+                logStep("Validation Complete.",false);
 
-                cliService.warn("Creating project directory...");
+                logStep("Creating project directory...");
 
                 pa.createProjectDirectory(projectName)
                     .then((projectDirectoryPath)=>{
 
-                        cliService.logSuccess("Project directory created.");
-                        cliService.warn("Copying template...");
+                        logStep("Project directory created.",false);
+                        logStep("Copying template...");
 
                         projectDirectory= projectDirectoryPath;
 
                         pa.copyTemplate(projectType,projectDirectory,templateName)
                             .then(()=>{
 
-                                cliService.logSuccess("Copying template completed.");
+                                logStep("Copying template completed.",false);
 
-                                cliService.warn("Initializing project...");
+                                logStep("Initializing project...");
 
                                 pa.initializeProject(projectName,projectDirectory)
                                     .then(()=>{
 
-                                        cliService.logSuccess("Project initialized.");
+                                        logStep("Project initialized.",false);
                                         confirmCreatingRemoteRepo();
                                     },doRejection);
 

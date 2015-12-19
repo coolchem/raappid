@@ -212,7 +212,7 @@ describe('project-assistant Test cases', () => {
         var gitInitStub:any;
 
         beforeEach(()=>{
-            mkdirStub = sinon.stub(fs,"mkdirsSync");
+            mkdirStub = sinon.stub(fs,"emptyDirSync");
             gitInitStub = sinon.stub(repoService,"initializeGit");
         });
 

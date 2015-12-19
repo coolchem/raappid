@@ -7,7 +7,7 @@ chalk.enabled = true;
 export const ERROR_UNSUPPORTED_COLOR:string = `Error logging message: The color sent to log the message unsupported
                                                Please send one of the following colors: red,blue,green,yellow`;
 
-export function confirm(question:string):Promise<boolean>
+export function confirm(question:string,color?:string):Promise<boolean>
 {
     var questionNew = question + '[y/n]';
 
@@ -23,11 +23,18 @@ export function confirm(question:string):Promise<boolean>
     });
 }
 
-export function askInput(message:string):Promise<string>
+export function askInput(message:string,color?:string):Promise<string>
 {
 
     return new Promise(function (resolve) {
-        process.stdout.write(message+":");
+
+        var newMessage = message+":";
+        if(color)
+        {
+            newMessage = chalk[color](newMessage).toString();
+        }
+
+        process.stdout.write(newMessage);
         process.stdin.setEncoding('utf8');
         var inputVal = '';
         process.stdin.on('data', function (data) {

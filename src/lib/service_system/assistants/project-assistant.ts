@@ -3,8 +3,9 @@
 
 import ps = require("../services/project-service");
 import repoService = require("../services/repo-service");
-import fs = require("fs-extra");
 import cliService = require("../services/cli-service");
+
+var fs = require("fs-extra");
 
 export const ERROR_GIT_NOT_INSTALLED:string = "Git not installed installed on the OS. " +
     "Please visit https://git-scm.com/downloads to download and install git ";
@@ -70,7 +71,7 @@ function askCredentials():Promise<{username:string,password:string}>
 function askToReEnterCredentials():Promise<{username:string,password:string}>
 {
     cliService.logError(ERROR_CREATING_REPO_BAD_CREDENTIALS.replace("#repo-type","GitHub"));
-    cliService.log(MESSAGE_RE_ENTER_CREDENTIALS);
+    cliService.log(MESSAGE_RE_ENTER_CREDENTIALS,"blue");
 
     return askCredentials();
 }
@@ -78,7 +79,7 @@ function askToReEnterCredentials():Promise<{username:string,password:string}>
 function askToEnterNewRepoName(repoName:string):Promise<string>
 {
     cliService.logError(MESSAGE_REPO_NAME_ALREADY_EXISTS.replace("#repo-type","GitHub").replace("#repo-name",repoName));
-    cliService.log(MESSAGE_ENTER_REPO_NAME);
+    cliService.log(MESSAGE_ENTER_REPO_NAME,"blue");
 
     return cliService.askInput("Enter New Repository Name");
 }
@@ -123,7 +124,7 @@ export function createRemoteRepository(projectName:string):Promise<{username:str
         var repoNameValidationFailCount:number = 0;
 
         //ask user if they want to create github repo
-        cliService.confirm(MESSAGE_CREATE_REMOTE_REPO.replace("#repo-type","GitHub")).then((result)=>{
+        cliService.confirm(MESSAGE_CREATE_REMOTE_REPO.replace("#repo-type","GitHub"),"blue").then((result)=>{
 
             if(result)
             {
@@ -214,7 +215,8 @@ export function createProjectDirectory(projectName:string):Promise<string>
 
     return new Promise((resolve)=>{
 
-        fs.mkdirsSync(projectDir);
+        fs.emptyDirSync(projectDir);
+
 
         repoService.initializeGit(projectDir).then(()=>{
             resolve(projectDir);

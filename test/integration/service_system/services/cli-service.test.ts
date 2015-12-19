@@ -185,6 +185,19 @@ describe('cli-service Integration Tests', () => {
 
         });
 
+        it("should add color to the message if it is provided",(done)=>{
+            process.nextTick(function mockResponse() {
+                stdin.send('i am fine\n');
+            });
+
+            cliService.askInput("Hello how are u?","yellow").then((input)=>{
+
+                expect(stdOutSpy).to.have.been.calledWith(chalk.yellow("Hello how are u?:"));
+                expect(input).to.equal("i am fine");
+                done();
+            })
+        });
+
     });
 
     describe('confirm', () => {
