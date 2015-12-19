@@ -126,6 +126,8 @@ export function sanitizePackageJson(projectName:string, projectDirectory:string)
     newPackage.repository = {url:"",type:""};
     newPackage.licenses = [];
     newPackage.keywords = [];
+    newPackage.readme = "";
+    newPackage.readmeFilename= "";
 
     fs.writeFileSync(projectDirectory+"/package.json",JSON.stringify(newPackage, null, '  ') + '\n');
     return newPackage;
