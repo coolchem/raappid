@@ -275,21 +275,27 @@ describe('project-assistant Test cases', () => {
 
         var sanitizeStub:any;
         var instalDepsStup:any;
+        var shrinkWrapStub:any;
 
         beforeEach(()=>{
             sanitizeStub = sinon.stub(ps,"sanitizePackageJson");
             instalDepsStup = sinon.stub(ps,"installDependencies");
+            shrinkWrapStub = sinon.stub(ps,"shrinkWrapDependencies");
+
+            sanitizeStub.returns({});
+            instalDepsStup.resolves(true);
+            shrinkWrapStub.resolves(true);
         });
 
         afterEach(()=>{
             sanitizeStub.restore();
             instalDepsStup.restore();
+            shrinkWrapStub.restore();
         });
 
         it("should sanitize the package.json",(done)=>{
 
-            sanitizeStub.returns({});
-            instalDepsStup.resolves(true);
+
             pa.initializeProject("test","testDirectory").then(()=>{
 
                 expect(sanitizeStub).to.have.been.calledWith("test","testDirectory").calledOnce;
@@ -300,8 +306,6 @@ describe('project-assistant Test cases', () => {
 
         it("should install project dependencies",(done)=>{
 
-            sanitizeStub.returns({});
-            instalDepsStup.resolves(true);
             pa.initializeProject("test","testDirectory").then(()=>{
 
                 expect(instalDepsStup).to.have.been.calledWith("testDirectory").calledOnce;
@@ -312,8 +316,27 @@ describe('project-assistant Test cases', () => {
 
         it("should reject with error if any issue with installing dependencies",(done)=>{
 
-            sanitizeStub.returns({});
             instalDepsStup.rejects(new Error("yay"));
+            pa.initializeProject("test","testDirectory").then(null,(error)=>{
+                expect(error).to.be.instanceOf(Error);
+                expect(error.message).to.equal("yay");
+                done()
+            });
+        });
+
+        it("should do shrinkwrap",(done)=>{
+
+            pa.initializeProject("test","testDirectory").then(()=>{
+
+                expect(shrinkWrapStub).to.have.been.calledWith("testDirectory").calledOnce;
+                done();
+            });
+        });
+
+
+        it("should reject with error if any issue with shrinkwrapping",(done)=>{
+
+            shrinkWrapStub.rejects(new Error("yay"));
             pa.initializeProject("test","testDirectory").then(null,(error)=>{
                 expect(error).to.be.instanceOf(Error);
                 expect(error.message).to.equal("yay");

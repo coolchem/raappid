@@ -133,5 +133,9 @@ export function sanitizePackageJson(projectName:string, projectDirectory:string)
     return newPackage;
 }
 
+export function shrinkWrapDependencies(projecDirectory:string):Promise<any>{
+    return shell.exec("npm shrinkwrap",projecDirectory);
+}
+
 
 

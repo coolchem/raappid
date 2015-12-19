@@ -105,6 +105,53 @@ describe('project-service Integration Tests', () => {
 
     });
 
+    describe('shrinkWrapDependencies', () => {
+
+
+        var tempProjectDir:string = path.resolve("./test/tempProject");
+        beforeEach((done)=>{
+            fs.mkdirs(tempProjectDir, function (err) {
+                fs.writeFileSync(tempProjectDir+"/package.json",JSON.stringify({version:"0.0.1",devDependencies:{typescript:"^1.7"}}, null, '  ') + '\n');
+                fs.mkdirsSync(tempProjectDir+"/scripts");
+                done();
+            })
+
+        });
+
+        afterEach(()=>{
+            fs.removeSync(tempProjectDir);
+
+        });
+
+
+
+        it('should do npm shrinkwrap', function(done) {
+
+            this.timeout(30000);
+
+            ps.shrinkWrapDependencies(tempProjectDir).then((result)=>{
+                try {
+                    var stats = fs.lstatSync(tempProjectDir+"/npm-shrinkwrap.json");
+
+                    if (stats.isFile()) {
+                        done();
+                    }
+                    else
+                    {
+                        done("File should have existed");
+                    }
+                }
+                catch (e) {
+
+                    done("File Should Have existed\n"+ e);
+                }
+
+            });
+        });
+
+
+    });
+
     describe("updatePackageJson",()=>{
 
         var tempProjectDir:string = path.resolve("./test/tempProject");
