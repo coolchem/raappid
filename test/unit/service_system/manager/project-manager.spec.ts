@@ -8,6 +8,7 @@ import fs = require("fs-extra");
 import pm = require("../../../../src/lib/service_system/managers/project-manager");
 import pa = require("../../../../src/lib/service_system/assistants/project-assistant");
 import cliService = require("../../../../src/lib/service_system/services/cli-service");
+import repoService = require("../../../../src/lib/service_system/services/repo-service");
 
 import SinonStub = Sinon.SinonStub;
 import SinonSpy = Sinon.SinonSpy;
@@ -31,6 +32,7 @@ describe('project-manager Test cases', () => {
         var copyTemplateStub:any;
         var initializeProjectStub:any;
         var confirmStub:any;
+        var addRemoteOrginStub:any;
 
         beforeEach(()=>{
             validateStub= sinon.stub(pa,"validate");
@@ -39,13 +41,15 @@ describe('project-manager Test cases', () => {
             copyTemplateStub = sinon.stub(pa,"copyTemplate");
             initializeProjectStub = sinon.stub(pa,"initializeProject");
             confirmStub = sinon.stub(cliService,"confirm");
+            addRemoteOrginStub = sinon.stub(repoService,"addRemoteOrigin");
 
             validateStub.resolves(true);
-            createRemoteRepositoryStub.resolves("testProject");
-            createProjectDirStub.resolves("tesProjectPath");
+            createProjectDirStub.resolves("testProjectPath");
             copyTemplateStub.resolves(true);
             initializeProjectStub.resolves(true);
             confirmStub.resolves(true);
+            createRemoteRepositoryStub.resolves({username:"test",repoName:"test"});
+            addRemoteOrginStub.resolves(true);
 
         });
         afterEach(()=>{
@@ -55,6 +59,7 @@ describe('project-manager Test cases', () => {
             copyTemplateStub.restore();
             initializeProjectStub.restore();
             confirmStub.restore();
+            addRemoteOrginStub.restore();
         });
 
         it("should do validation",()=>{
@@ -74,54 +79,9 @@ describe('project-manager Test cases', () => {
 
         });
 
-        it("should ask user to create remote repo",(done)=>{
-
-            pm.createProjectCLI("test","testProject").then(()=>{
-                expect(createRemoteRepositoryStub).to.have.been.calledOnce;
-                done();
-            });
-
-
-        });
-
-        it("should ask user to create local repo, if create remote repo step fails",(done)=>{
-
-            createRemoteRepositoryStub.rejects(new Error("yay"));
-            pm.createProjectCLI("test","testProject").then(()=>{
-                expect(confirmStub).to.have.been.calledWith(pm.MESSAGE_CONTINUE_WITH_LOCAL_GIT_REPO.replace("#repo-type","GitHub"));
-                done();
-            });
-
-        });
-
-        it("should reject with error if user decides to not create local repo",(done)=>{
-
-            createRemoteRepositoryStub.rejects(new Error("yay"));
-            confirmStub.resolves(false);
-            pm.createProjectCLI("test","testProject").then(null,(error)=>{
-                expect(error).to.be.instanceOf(Error);
-                expect(error.message).to.equal(pm.ERROR_USER_CANCELED_CREATE_PROJECT);
-                done();
-            });
-
-        });
-
-        it("should create project directory, with remote repo",(done)=>{
-
-            validateStub.resolves(true);
-            createRemoteRepositoryStub.resolves("testUsername");
-            pm.createProjectCLI("test","testProject").then(()=>{
-                expect(createProjectDirStub).to.have.been.calledWith("testProject",{username:"testUsername",repo:"testProject"});
-                done();
-            });
-
-        });
 
         it("should create project directory, with local repo",(done)=>{
 
-            validateStub.resolves(true);
-            createRemoteRepositoryStub.rejects(false);
-            confirmStub.resolves(true);
             pm.createProjectCLI("test","testProject").then(()=>{
                 expect(createProjectDirStub).to.have.been.calledWith("testProject");
                 done();
@@ -131,9 +91,6 @@ describe('project-manager Test cases', () => {
 
         it("should reject with error if create project directory step fails",(done)=>{
 
-            validateStub.resolves(true);
-            createRemoteRepositoryStub.rejects(false);
-            confirmStub.resolves(true);
             createProjectDirStub.rejects(new Error("yay"));
             pm.createProjectCLI("test","testProject").then(null,(error)=>{
 
@@ -147,13 +104,8 @@ describe('project-manager Test cases', () => {
 
         it("should copy template",(done)=>{
 
-            validateStub.resolves(true);
-            createRemoteRepositoryStub.rejects(false);
-            confirmStub.resolves(true);
-            createProjectDirStub.resolves("testDirectory");
-
             pm.createProjectCLI("test","testProject","humm").then(()=>{
-                expect(copyTemplateStub).to.have.been.calledWith("test","testDirectory","humm");
+                expect(copyTemplateStub).to.have.been.calledWith("test","testProjectPath","humm");
                 done();
             });
 
@@ -161,10 +113,6 @@ describe('project-manager Test cases', () => {
 
         it("should reject with error if copy template step fails",(done)=>{
 
-            validateStub.resolves(true);
-            createRemoteRepositoryStub.rejects(false);
-            confirmStub.resolves(true);
-            createProjectDirStub.resolves("testDirectory");
             copyTemplateStub.rejects(new Error("yay"));
             pm.createProjectCLI("test","testProject","humm").then(null,(error)=>{
 
@@ -175,13 +123,8 @@ describe('project-manager Test cases', () => {
 
         });
 
-        it("should initialize project and resolve with summary",(done)=>{
-            validateStub.resolves(true);
-            createRemoteRepositoryStub.rejects(false);
-            confirmStub.resolves(true);
-            createProjectDirStub.resolves("testDirectory");
-            copyTemplateStub.resolves(true);
-            initializeProjectStub.resolves(true);
+        it("should initialize project",(done)=>{
+
             pm.createProjectCLI("test","testProject","humm").then((result)=>{
                 expect(initializeProjectStub).to.have.been.called;
                 expect(result).to.be.instanceOf(Array);
@@ -189,18 +132,57 @@ describe('project-manager Test cases', () => {
             });
         });
 
-        it("should resolve with summary if the initialize project fails ",(done)=>{
-            validateStub.resolves(true);
-            createRemoteRepositoryStub.rejects(false);
-            confirmStub.resolves(true);
-            createProjectDirStub.resolves("testDirectory");
-            copyTemplateStub.resolves(true);
+        it("should reject with error if initialize project step fails",(done)=>{
+
             initializeProjectStub.rejects(new Error("yay"));
-            pm.createProjectCLI("test","testProject","humm").then((result)=>{
+            pm.createProjectCLI("test","testProject","humm").then(null,(error)=>{
                 expect(initializeProjectStub).to.have.been.called;
+                expect(error).to.be.instanceOf(Error);
+                expect(error.message).to.equal("yay");
+                done();
+            });
+        });
+
+
+        it("should ask user to create remote repo",(done)=>{
+
+            pm.createProjectCLI("test","testProject").then(()=>{
+                expect(createRemoteRepositoryStub).to.have.been.calledOnce;
+                done();
+            });
+
+        });
+
+        it("should resolve with summary, if user does not want to create remote repo",(done)=>{
+
+            createRemoteRepositoryStub.resolves(false);
+            pm.createProjectCLI("test","testProject").then((result)=>{
+
                 expect(result).to.be.instanceOf(Array);
                 done();
             });
+
+        });
+
+        it("should resolve with summary, after creating remote repository and adding git remote",(done)=>{
+
+            pm.createProjectCLI("test","testProject").then((result)=>{
+                expect(addRemoteOrginStub).to.have.been.calledWith("test","test","testProjectPath").calledOnce;
+                expect(result).to.be.instanceOf(Array);
+                done();
+            });
+
+        });
+
+        it("should resolve with summary, if create remote repo step fails",(done)=>{
+
+            createRemoteRepositoryStub.rejects(new Error("yay"));
+
+            pm.createProjectCLI("test","testProject").then((result)=>{
+                expect(result).to.be.instanceOf(Array);
+                done();
+            });
+
         });
 
     });

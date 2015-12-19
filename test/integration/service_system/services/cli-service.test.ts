@@ -4,6 +4,7 @@ import chai = require('chai');
 import sinon = require('sinon');
 import chalk = require('chalk');
 import cliService =require("../../../../src/lib/service_system/services/cli-service");
+import SinonSpy = Sinon.SinonSpy;
 
 chalk.enabled = true;
 
@@ -133,15 +134,17 @@ describe('cli-service Integration Tests', () => {
 
     describe('askInput', () => {
 
+        var stdOutSpy:SinonSpy;
         beforeEach(function () {
             stdin = require('mock-stdin').stdin();
+            stdOutSpy = sinon.spy(process.stdout,"write");
+
         });
 
         afterEach(()=>{
             stdin.end();
             stdin.reset();
-            logSpy.restore();
-            logSpy = sinon.spy(console,"log");
+            stdOutSpy.restore();
         });
 
         it('should ask user for input', function(done) {
@@ -152,7 +155,7 @@ describe('cli-service Integration Tests', () => {
 
             cliService.askInput("Hello how are u?").then((input)=>{
 
-                expect(logSpy).to.have.been.calledWith("Hello how are u?:");
+                expect(stdOutSpy).to.have.been.calledWith("Hello how are u?:");
                 expect(input).to.equal("i am fine");
                 done();
             })
@@ -186,15 +189,16 @@ describe('cli-service Integration Tests', () => {
 
     describe('confirm', () => {
 
+        var stdOutSpy:SinonSpy;
         beforeEach(function () {
+            stdOutSpy = sinon.spy(process.stdout,"write");
             stdin = require('mock-stdin').stdin();
         });
 
         afterEach(()=>{
             stdin.end();
             stdin.reset();
-            logSpy.restore();
-            logSpy = sinon.spy(console,"log");
+            stdOutSpy.restore();
         });
 
         it('should ask user to give yes or no answer', function(done) {
@@ -202,7 +206,7 @@ describe('cli-service Integration Tests', () => {
             cliService.confirm("Are we there yet?").then(()=>{
 
             });
-            expect(logSpy).to.have.been.calledWith("Are we there yet?[y/n]:");
+            expect(stdOutSpy).to.have.been.calledWith("Are we there yet?[y/n]:");
             done();
         });
 
@@ -263,7 +267,7 @@ describe('cli-service Integration Tests', () => {
 
             cliService.confirm("Are we there yet yet?").then((answer)=>{
 
-                expect(logSpy).to.have.been.calledWith("Are we there yet yet?[y/n]:").calledTwice;
+                expect(stdOutSpy).to.have.been.calledWith("Are we there yet yet?[y/n]:").calledTwice;
                 done();
             });
 

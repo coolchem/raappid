@@ -4,6 +4,9 @@
 
 import pa = require("../assistants/project-assistant");
 import cliService = require("../services/cli-service");
+import fs = require("fs-extra");
+import repoService = require("../services/repo-service");
+
 
 
 export const ERROR_USER_CANCELED_CREATE_PROJECT:string = "Error Creating Project: User canceled project creation";
@@ -11,7 +14,7 @@ export const ERROR_USER_CANCELED_CREATE_PROJECT:string = "Error Creating Project
 export const MESSAGE_CONTINUE_WITH_LOCAL_GIT_REPO =
 `It Seems there is an issue creating your #repo-type repository.
 
-you can continue to create project with local git repository, and hook in remote git repository at later time.
+you can hook in remote git repository at later time.
 
 if you do not want to create the project, please answer No to below question.
 
@@ -24,78 +27,79 @@ export function createProjectCLI(projectType:string,projectName:string,templateN
 
     return new Promise((resolve,reject)=>{
 
-        function doRejection(error){
-
-            reject(error);
-        }
-
 
         var projectDirectory:string;
         var summary:string[] = [];
+
+        function doRejection(error){
+
+            try {
+                // Query the entry
+                var stats = fs.lstatSync(projectDirectory);
+
+                // Is it a directory?
+                fs.removeSync(projectDirectory);
+            }
+            catch (e) {
+
+            }
+            reject(error);
+        }
+
+        function confirmCreatingRemoteRepo():void
+        {
+            pa.createRemoteRepository(projectName).then((result:{username:string,repoName:string})=>{
+                if(!result)
+                {
+                    resolve(summary);
+                }
+                else
+                {
+                    repoService.addRemoteOrigin(result.username,result.repoName,projectDirectory)
+                    .then(()=>{
+                        resolve(summary);
+                    });
+                }
+            },(error)=>{
+                resolve(summary);
+            })
+        }
+
+
         cliService.warn("Validating...");
+
         pa.validate(projectType,projectName)
             .then(()=>{
                 cliService.logSuccess("Validation Complete.");
 
-                cliService.warn("Creating Remote Repository...");
+                cliService.warn("Creating project directory...");
 
-                pa.createRemoteRepository(projectName)
-                    .then((result)=>{
+                pa.createProjectDirectory(projectName)
+                    .then((projectDirectoryPath)=>{
 
+                        cliService.logSuccess("Project directory complete.");
+                        cliService.warn("Copying template...");
 
-                    var remoteRepo:{username:string,repo:string};
-                    if(result)
-                    {
-                        cliService.logSuccess("Creating Remote repository complete.");
+                        projectDirectory= projectDirectoryPath;
+                        cliService.warn(projectDirectoryPath+"\n");
 
-                        remoteRepo = {username:result as string,repo:projectName}
-                    }
-                    continueCreatingProjectDir(remoteRepo)
+                        pa.copyTemplate(projectType,projectDirectory,templateName)
+                            .then(()=>{
 
-                },(error)=>{
+                                cliService.logSuccess("Copying template completed.");
 
-                    cliService.confirm(MESSAGE_CONTINUE_WITH_LOCAL_GIT_REPO.replace("#repo-type","GitHub"))
-                        .then((result)=>{
-                            if(result)
-                            {
-                                continueCreatingProjectDir();
-                            }
-                            else
-                            {
-                                doRejection(new Error(ERROR_USER_CANCELED_CREATE_PROJECT));
-                            }
-                        })
-                });
+                                cliService.warn("Initializing project...");
+
+                                pa.initializeProject(projectName,projectDirectory)
+                                    .then(()=>{
+
+                                        cliService.logSuccess("Project initialized.");
+                                        confirmCreatingRemoteRepo();
+                                    },doRejection);
+
+                            },doRejection);
+                    },doRejection);
             },doRejection);
-
-        function continueCreatingProjectDir(remoteRepo?:{username:string,repo:string}):void
-        {
-            cliService.warn("Creating project directory...");
-
-            pa.createProjectDirectory(projectName,remoteRepo)
-                .then((projectDirectoryPath)=>{
-
-                    cliService.logSuccess("Project directory complete.");
-                    cliService.warn("Copying template...");
-                    projectDirectory= projectDirectoryPath;
-                    pa.copyTemplate(projectType,projectDirectory,templateName)
-                        .then(()=>{
-
-                            cliService.logSuccess("Copying template completed.");
-                            cliService.warn("Initializing project...");
-
-                            pa.initializeProject(projectName,projectDirectory)
-                                .then(()=>{
-                                cliService.logSuccess("Project initialized.");
-                                resolve(summary);
-                            },(error)=>{
-                                cliService.logError(error.message);
-                                resolve(summary);
-                            });
-
-                        },doRejection);
-                },doRejection)
-        }
     });
 
 }

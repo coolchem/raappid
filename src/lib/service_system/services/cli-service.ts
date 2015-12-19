@@ -27,7 +27,7 @@ export function askInput(message:string):Promise<string>
 {
 
     return new Promise(function (resolve) {
-        console.log(message+":");
+        process.stdout.write(message+":");
         process.stdin.setEncoding('utf8');
         var inputVal = '';
         process.stdin.on('data', function (data) {

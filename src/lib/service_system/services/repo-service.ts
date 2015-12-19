@@ -45,6 +45,13 @@ export function cloneGitRepository(username:string,repoName:string,dirToCloneInt
     });
 }
 
+export function addRemoteOrigin(username:string,repoName:string,projectDirectory:string):Promise<any>
+{
+    var cmd:string = "git remote add origin https://github.com/" +username+"/"+repoName+".git";
+
+    return shell.exec(cmd,projectDirectory);
+}
+
 
 export function createRemoteRepository(username:string,password:string,repoName:string):Promise<any>
 {

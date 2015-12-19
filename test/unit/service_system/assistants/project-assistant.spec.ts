@@ -73,98 +73,119 @@ describe('project-assistant Test cases', () => {
 
         var confirmStub:any;
         var askStub:any;
-        var logErrorSpy:SinonSpy = sinon.spy(cliService,"logError");
-        var logSpy:SinonSpy = sinon.spy(cliService,"log");
+        var logErrorSpy:SinonSpy;
+        var logSpy:SinonSpy;
+        var createRemoteRepositoryStub:any;
         beforeEach(()=>{
+
+            logErrorSpy = sinon.spy(cliService,"logError");
+            logSpy = sinon.spy(cliService,"log");
+            createRemoteRepositoryStub = sinon.stub(repoService,"createRemoteRepository");
             confirmStub = sinon.stub(cliService,"confirm");
             askStub = sinon.stub(cliService,"askInput");
+            confirmStub.resolves(true);
+            askStub.resolves("test");
         });
 
         afterEach(()=>{
 
-            if(confirmStub.restore)
-                confirmStub.restore();
-            if(askStub.restore)
-                askStub.restore();
+            logErrorSpy.restore();
+            logSpy.restore();
+            createRemoteRepositoryStub.restore();
+            confirmStub.restore();
+            askStub.restore();
+
         });
 
         it('should confirm with user to create github repository', function(done) {
 
             confirmStub.resolves(false);
-            pa.createRemoteRepository("humm").then(()=>{});
-            expect(confirmStub).to.have.been.calledWith(pa.MESSAGE_CREATE_REMOTE_REPO.replace("#repo-type","GitHub"));
-            done();
-        });
-
-        it('should resolve with false if user answers no', function(done) {
-
-            confirmStub.resolves(false);
             pa.createRemoteRepository("humm").then((result)=>{
-                expect(result).to.be.false;
+                expect(confirmStub).to.have.been.calledWith(pa.MESSAGE_CREATE_REMOTE_REPO.replace("#repo-type","GitHub"));
                 done();
             });
 
+        });
 
+        it('should resolve with null if user answers no', function(done) {
+
+            confirmStub.resolves(false);
+            pa.createRemoteRepository("humm").then((result)=>{
+                expect(result).to.be.null;
+                done();
+            });
         });
 
         it('should ask user for credentials and create repository', function(done) {
 
-            confirmStub.withArgs("Would like to create a GitHub repository for your project?").resolves(true);
-            askStub.withArgs("Enter Username").resolves("test");
-            askStub.withArgs("Enter Password").resolves("test");
 
-            var repoStub:any = sinon.stub(repoService,"createRemoteRepository");
-            repoStub.resolves({});
+            createRemoteRepositoryStub.resolves({});
 
-            pa.createRemoteRepository("humm").then(()=>{
-                expect(repoStub).to.have.been.called;
+            pa.createRemoteRepository("humm").then((result)=>{
+                expect(createRemoteRepositoryStub).to.have.been.called;
                 expect(askStub).to.have.been.calledWith("Enter Username");
                 expect(askStub).to.have.been.calledWith("Enter Password");
-                repoStub.restore();
+
+                expect(result.username).to.equal("test");
+                expect(result.repoName).to.equal("humm");
                 done();
             });
         });
 
         it('should ask user to re enter credentials, if create repository fails with bad credentials', function(done) {
 
-            var stub1 = askStub.withArgs("Enter Username").resolves("test");
-            var stub2 = askStub.withArgs("Enter Password").resolves("test");
-            confirmStub.resolves(true);
-
-            var repoStub:any = sinon.stub(repoService,"createRemoteRepository");
-            repoStub.onFirstCall().rejects({code:401});
-            repoStub.onSecondCall().resolves(true);
+            createRemoteRepositoryStub.onFirstCall().rejects({code:401});
+            createRemoteRepositoryStub.onSecondCall().resolves(true);
 
             pa.createRemoteRepository("humm").then(()=>{
 
                 expect(logErrorSpy).to.have.been.calledWith(pa.ERROR_CREATING_REPO_BAD_CREDENTIALS.replace("#repo-type","GitHub"));
                 expect(logSpy).to.have.been.calledWith(pa.MESSAGE_RE_ENTER_CREDENTIALS);
-
-                expect(stub1).to.have.been.calledWith("Enter Username").calledTwice;
-                expect(stub2).to.have.been.calledWith("Enter Password").calledTwice;
-                repoStub.restore();
-
                 done();
             });
 
         });
 
-        it('should reject, if create repository fails with bad credentials 2nd time', function(done) {
+        it('should reject, if create repository fails with bad credentials 3 times times', function(done) {
 
-            var stub1 = askStub.withArgs("Enter Username").resolves("test");
-            var stub2 = askStub.withArgs("Enter Password").resolves("test");
-            confirmStub.resolves(true);
-
-            var repoStub:any = sinon.stub(repoService,"createRemoteRepository");
-            repoStub.onFirstCall().rejects({code:401});
-            repoStub.onSecondCall().rejects({code:401});
+            createRemoteRepositoryStub.onFirstCall().rejects({code:401});
+            createRemoteRepositoryStub.onSecondCall().rejects({code:401});
+            createRemoteRepositoryStub.onThirdCall().rejects({code:401});
 
             pa.createRemoteRepository("humm").then(null,(error)=>{
 
-                expect(stub1).to.have.been.calledWith("Enter Username").calledTwice;
-                expect(stub2).to.have.been.calledWith("Enter Password").calledTwice;
-                repoStub.restore();
+                expect(createRemoteRepositoryStub).to.have.been.calledThrice;
+                expect(error).to.be.instanceOf(Error);
+                expect(error.message).to.equal(pa.ERROR_CREATING_REMOTE_REPO);
+                done();
+            });
 
+        });
+
+        it('should ask user to choose a new repo name, if the repo already exists', function(done) {
+
+            createRemoteRepositoryStub.onFirstCall().rejects({code:422,message:{message:"Validation Failed"}});
+            createRemoteRepositoryStub.onSecondCall().resolves({});
+
+            pa.createRemoteRepository("humm").then((result)=>{
+
+                expect(logErrorSpy).to.have.been.calledWith(pa.MESSAGE_REPO_NAME_ALREADY_EXISTS.replace("#repo-type","GitHub").replace("#repo-name","humm"));
+                expect(logSpy).to.have.been.calledWith(pa.MESSAGE_ENTER_REPO_NAME);
+                done();
+            });
+
+        });
+
+        it('should reject after 3 attempts at creating repository with a new repo name', function(done) {
+
+            createRemoteRepositoryStub.onFirstCall().rejects({code:422,message:{message:"Validation Failed"}});
+            createRemoteRepositoryStub.onSecondCall().rejects({code:422,message:{message:"Validation Failed"}});
+            createRemoteRepositoryStub.onThirdCall().rejects({code:422,message:{message:"Validation Failed"}});
+
+            pa.createRemoteRepository("humm").then(null,(error)=>{
+                expect(createRemoteRepositoryStub).to.have.been.calledThrice;
+                expect(error).to.be.instanceOf(Error);
+                expect(error.message).to.equal(pa.ERROR_CREATING_REMOTE_REPO);
                 done();
             });
 
@@ -172,58 +193,36 @@ describe('project-assistant Test cases', () => {
 
         it('should reject, if create repository fails for any  other reasons', function(done) {
 
-            var stub1 = askStub.withArgs("Enter Username").resolves("test");
-            var stub2 = askStub.withArgs("Enter Password").resolves("test");
-            confirmStub.resolves(true);
-
-            var repoStub:any = sinon.stub(repoService,"createRemoteRepository");
-            repoStub.rejects({});
+            createRemoteRepositoryStub.rejects(new Error("yay"));
 
             pa.createRemoteRepository("humm").then(null,(error)=>{
-
-                expect(stub1).to.have.been.calledWith("Enter Username").calledOnce;
-                expect(stub2).to.have.been.calledWith("Enter Password").calledOnce;
-                repoStub.restore();
-
+                expect(createRemoteRepositoryStub).to.have.been.calledOnce;
+                expect(error).to.be.instanceOf(Error);
+                expect(error.message).to.equal(pa.ERROR_CREATING_REMOTE_REPO);
                 done();
             });
 
         });
-
 
     });
 
     describe("createProjectDirectory",()=>{
 
-        var cloneStub:any;
         var mkdirStub:SinonStub;
         var gitInitStub:any;
 
         beforeEach(()=>{
-            cloneStub = sinon.stub(repoService,"cloneGitRepository");
             mkdirStub = sinon.stub(fs,"mkdirsSync");
             gitInitStub = sinon.stub(repoService,"initializeGit");
         });
 
         afterEach(()=>{
-            cloneStub.restore();
             mkdirStub.restore();
             gitInitStub.restore();
         });
 
-        it("should clone repository if remoteRepo is given",(done)=>{
 
-            cloneStub.resolves(true);
-            pa.createProjectDirectory("test",{username:"test",repo:"test"}).then(()=>{
-
-                expect(cloneStub).to.have.been.calledWith("test","test",process.cwd());
-                done();
-            });
-
-        });
-
-        it("should create directory with project name and do git init, if remote repo is not present",(done)=>{
-
+        it("should create directory with project name and do git init",(done)=>{
 
             mkdirStub.returns(null);
             gitInitStub.resolves(true);
@@ -241,15 +240,19 @@ describe('project-assistant Test cases', () => {
 
         var downloadStub:any;
         var copyStub:SinonStub;
+        var writeFileSyncStub:any;
 
         beforeEach(()=>{
             downloadStub = sinon.stub(ps,"downloadTemplate");
             copyStub = sinon.stub(fs,"copySync");
+            writeFileSyncStub = sinon.stub(fs,"writeFileSync");
+            writeFileSyncStub.returns(true);
         });
 
         afterEach(()=>{
             downloadStub.restore();
             copyStub.restore();
+            writeFileSyncStub.restore();
         });
 
         it("should download template and return template path",(done)=>{
@@ -312,7 +315,6 @@ describe('project-assistant Test cases', () => {
             sanitizeStub.returns({});
             instalDepsStup.rejects(new Error("yay"));
             pa.initializeProject("test","testDirectory").then(null,(error)=>{
-
                 expect(error).to.be.instanceOf(Error);
                 expect(error.message).to.equal("yay");
                 done()
