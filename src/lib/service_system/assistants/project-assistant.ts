@@ -229,7 +229,6 @@ export function copyTemplate(projectType:string,projectDirectory:string,template
 
     return ps.downloadTemplate(projectType,projectDirectory,templateName).then((templatePath:string)=>{
 
-        console.log("copyTemplate",templatePath);
         fs.copySync(templatePath,projectDirectory);
 
         return true;

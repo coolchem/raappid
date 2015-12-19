@@ -208,6 +208,48 @@ describe('repo-service Test cases', () => {
         });
     });
 
+    describe('addRemoteOrigin', () => {
+
+        var shellStub;
+        beforeEach(()=>{
+            shellStub = sinon.stub(shell,"exec");
+
+        });
+
+        afterEach(()=>{
+            shellStub.restore();
+        });
+
+        it('should create appropriate remote url and call git add remote', function(done) {
+
+
+            shellStub.resolves(true);
+
+            repoService.addRemoteOrigin("test","testRepo","testDir").then(()=>{
+
+                expect(shellStub).to.have.been.calledWith("git remote add origin https://github.com/test/testRepo.git","testDir");
+
+                done();
+
+
+            })
+        });
+
+        it('should reject with error if there was any error in adding remote', function(done) {
+
+
+            shellStub.rejects(new Error("yay"));
+
+            repoService.addRemoteOrigin("test","test","testDir").then(null,(error)=>{
+
+                expect(error).to.be.instanceOf(Error);
+                expect(error.message).to.equal("yay");
+                done();
+
+            })
+        });
+    });
+
 
     describe('createRemoteRepository', () => {
 

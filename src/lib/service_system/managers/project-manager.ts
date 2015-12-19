@@ -35,13 +35,12 @@ export function createProjectCLI(projectType:string,projectName:string,templateN
 
             try {
                 // Query the entry
-                var stats = fs.lstatSync(projectDirectory);
+                fs.lstatSync(projectDirectory);
 
-                // Is it a directory?
                 fs.removeSync(projectDirectory);
             }
             catch (e) {
-
+                //means project directory was not created
             }
             reject(error);
         }
@@ -77,11 +76,10 @@ export function createProjectCLI(projectType:string,projectName:string,templateN
                 pa.createProjectDirectory(projectName)
                     .then((projectDirectoryPath)=>{
 
-                        cliService.logSuccess("Project directory complete.");
+                        cliService.logSuccess("Project directory created.");
                         cliService.warn("Copying template...");
 
                         projectDirectory= projectDirectoryPath;
-                        cliService.warn(projectDirectoryPath+"\n");
 
                         pa.copyTemplate(projectType,projectDirectory,templateName)
                             .then(()=>{
