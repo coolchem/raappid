@@ -11,7 +11,7 @@ export function confirm(question:string,color?:string):Promise<boolean>
 {
     var questionNew = question + '[y/n]';
 
-    var promise = askInput(questionNew);
+    var promise = askInput(questionNew,color);
 
     return promise.then((answer)=>{
         if (answer.match(/\b(no|n)\b/i))
