@@ -30,7 +30,7 @@ npm -g update raappid
 
 ### How to use
 
-Raappid is a project scaffolding tool, which uses predifined or
+Raappid is a project scaffolding tool, which uses predefined or
 user defined templates to scaffold your project.
 
 ##### Command
