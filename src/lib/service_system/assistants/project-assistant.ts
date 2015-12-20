@@ -243,7 +243,7 @@ export function initializeProject(projectName:string,projectDirectory:string):Pr
 {
     //update package.json
 
-    ps.sanitizePackageJson(projectName,projectDirectory);
+    ps.sanitizePackage(projectName,projectDirectory);
 
     return ps.installDependencies(projectDirectory).then(()=>{
         return ps.shrinkWrapDependencies(projectDirectory);

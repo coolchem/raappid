@@ -173,6 +173,19 @@ describe('project-service Integration Tests', () => {
                         gitHead:"asdadad"
                     }, null, '  ') + '\n');
 
+                fs.writeFileSync(tempProjectDir+"/.npmignore",`node_modules
+                                .idea
+                                **/*.iml
+                                .DS_STORE
+                                src/**/*.js
+                                test/**/*.js
+                                **/*.map
+                                src/typings
+                                coverage
+                                dist
+                                npm-debug.log
+                                .env`);
+
                 done();
             })
 
@@ -184,7 +197,7 @@ describe('project-service Integration Tests', () => {
 
         it("should force update package.json with project name",()=>{
 
-            ps.sanitizePackageJson("test",tempProjectDir);
+            ps.sanitizePackage("test",tempProjectDir);
 
             var json = JSON.parse(fs.readFileSync(tempProjectDir+"/package.json", 'utf8'));
 
@@ -195,7 +208,7 @@ describe('project-service Integration Tests', () => {
         });
 
         it("should only remove any properties which starts with '_' and also gitHead property",()=>{
-            ps.sanitizePackageJson("test",tempProjectDir);
+            ps.sanitizePackage("test",tempProjectDir);
 
             var json = JSON.parse(fs.readFileSync(tempProjectDir+"/package.json", 'utf8'));
 
@@ -208,7 +221,7 @@ describe('project-service Integration Tests', () => {
         });
 
         it("should reset certain properties",()=>{
-            ps.sanitizePackageJson("test",tempProjectDir);
+            ps.sanitizePackage("test",tempProjectDir);
 
             var json = JSON.parse(fs.readFileSync(tempProjectDir+"/package.json", 'utf8'));
 
@@ -223,11 +236,32 @@ describe('project-service Integration Tests', () => {
         });
 
         it("should set the version number to '0.0.1",()=>{
-            ps.sanitizePackageJson("test",tempProjectDir);
+            ps.sanitizePackage("test",tempProjectDir);
 
             var json = JSON.parse(fs.readFileSync(tempProjectDir+"/package.json", 'utf8'));
 
             expect(json.version).to.equal("0.0.1");
+        });
+
+        it("should check and rename .npmignore to .gitignore",(done)=>{
+            ps.sanitizePackage("test",tempProjectDir);
+
+            try {
+                  fs.lstatSync(tempProjectDir+"/.npmignore");
+                  done("File should not have existed");
+            }
+            catch (e) {
+
+                try {
+                    fs.lstatSync(tempProjectDir+"/.gitignore");
+                    done();
+                }
+                catch (e) {
+
+                    done("File Should Have existed\n"+ e);
+                }
+            }
+
         });
     });
 

@@ -105,7 +105,7 @@ export function installDependencies(projectDirectoryPath:string):Promise<boolean
 
 }
 
-export function sanitizePackageJson(projectName:string, projectDirectory:string):Object
+export function sanitizePackage(projectName:string, projectDirectory:string):Object
 {
     var pkg:any = JSON.parse(fs.readFileSync(projectDirectory+"/package.json", 'utf8'));
 
@@ -130,6 +130,17 @@ export function sanitizePackageJson(projectName:string, projectDirectory:string)
     newPackage.readmeFilename= "";
 
     fs.writeFileSync(projectDirectory+"/package.json",JSON.stringify(newPackage, null, '  ') + '\n');
+
+
+    try {
+        //check for .npmignore and rename it to .gitignore
+        fs.lstatSync(projectDirectory+"/.npmignore");
+        fs.renameSync(projectDirectory+"/.npmignore",projectDirectory+"/.gitignore");
+    }
+    catch (e) {
+        //means .gitIgnore not found
+    }
+
     return newPackage;
 }
 
