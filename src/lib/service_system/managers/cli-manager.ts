@@ -45,6 +45,7 @@ export const ERROR_INVALID_PROJECT_NAME:string =
 export function processArguments(argv:any):{projectType:string,
     projectName:string,templateName:string}{
 
+    var error:Error;
     if(argv.help === true || argv.h === true)
     {
         cliService.log(CLI_HELP_TEXT);
@@ -55,11 +56,15 @@ export function processArguments(argv:any):{projectType:string,
 
     if(commands.length < 2)
     {
-        throw new Error(ERROR_ARGUMENTS_MISMATCH);
+        error = Error(ERROR_ARGUMENTS_MISMATCH);
+        cliService.logError(error.message);
+        throw error;
     }
     else if(commands.length > 2)
     {
-        throw new Error(ERROR_INVALID_PROJECT_NAME);
+        error = new Error(ERROR_INVALID_PROJECT_NAME);
+        cliService.logError(error.message);
+        throw error;
     }
 
     var projectType:string = commands[0];
