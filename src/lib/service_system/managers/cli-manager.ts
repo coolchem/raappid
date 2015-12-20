@@ -11,12 +11,16 @@ export const CLI_HELP_TEXT:string =
          project-type: node-app | web-app | template
 
          project-name: it is the name you want to give to your project,
-                       a folder with your project name will be created in the directory where the command is run
+                       a folder with your project name will be created in the directory
+                       where the command is run
 
-                       Requirements: name should be single word for example, my-project, my_project, MyProject or myproject etc.
+                       Requirements: name should be single word for example,
+                       my-project, my_project, MyProject or myproject etc.
 
-         template-name: template name refers to the remote repository from which the project will be based on.
-                        If no template name is provided the default templates for each app will be used to create the project.
+         template-name: template name refers to the remote repository from which
+                        the project will be based on.
+                        If no template name is provided, the default template based on
+                        project type will be used to create the project.
 
                         Examples:
                         npm-package-name
