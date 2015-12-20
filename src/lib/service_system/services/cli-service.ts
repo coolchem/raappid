@@ -2,6 +2,9 @@
 
 
 import chalk = require('chalk');
+
+
+var read = require("read");
 chalk.enabled = true;
 
 export const ERROR_UNSUPPORTED_COLOR:string = `Error logging message: The color sent to log the message unsupported
@@ -11,7 +14,7 @@ export function confirm(question:string,color?:string):Promise<boolean>
 {
     var questionNew = question + '[y/n]';
 
-    var promise = askInput(questionNew,color);
+    var promise = askInput(questionNew,false,color);
 
     return promise.then((answer)=>{
         if (answer.match(/\b(no|n)\b/i))
@@ -23,7 +26,7 @@ export function confirm(question:string,color?:string):Promise<boolean>
     });
 }
 
-export function askInput(message:string,color?:string):Promise<string>
+export function askInput(message:string,isPassword=false,color?:string):Promise<string>
 {
 
     return new Promise(function (resolve) {
@@ -34,18 +37,12 @@ export function askInput(message:string,color?:string):Promise<string>
             newMessage = chalk[color](newMessage).toString();
         }
 
-        process.stdout.write(newMessage);
-        process.stdin.setEncoding('utf8');
-        var inputVal = '';
-        process.stdin.on('data', function (data) {
-            var lastChar = data.substr(data.length - 1, 1);
-            if (lastChar === '\n' || lastChar === '\r' || lastChar === '\u0004') {
-                process.stdin.removeAllListeners('data');
-                inputVal += data.substr(0, data.length - 1);
-                resolve(inputVal.trim());
-            }
-            inputVal += data;
-        });
+        read({prompt:newMessage,
+            silent:isPassword,
+            replace:"*",
+            },(error,result)=>{
+                resolve(result);
+            });
     });
 }
 

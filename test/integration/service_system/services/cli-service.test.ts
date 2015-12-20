@@ -6,6 +6,8 @@ import chalk = require('chalk');
 import cliService =require("../../../../src/lib/service_system/services/cli-service");
 import SinonSpy = Sinon.SinonSpy;
 
+var read = require("read");
+
 chalk.enabled = true;
 
 chai.use(require("sinon-chai"));
@@ -134,17 +136,13 @@ describe('cli-service Integration Tests', () => {
 
     describe('askInput', () => {
 
-        var stdOutSpy:SinonSpy;
         beforeEach(function () {
             stdin = require('mock-stdin').stdin();
-            stdOutSpy = sinon.spy(process.stdout,"write");
-
         });
 
         afterEach(()=>{
             stdin.end();
             stdin.reset();
-            stdOutSpy.restore();
         });
 
         it('should ask user for input', function(done) {
@@ -155,7 +153,6 @@ describe('cli-service Integration Tests', () => {
 
             cliService.askInput("Hello how are u?").then((input)=>{
 
-                expect(stdOutSpy).to.have.been.calledWith("Hello how are u?:");
                 expect(input).to.equal("i am fine");
                 done();
             })
@@ -171,16 +168,7 @@ describe('cli-service Integration Tests', () => {
             cliService.askInput("Hello how are u?").then((input)=>{
 
                 expect(input).to.equal("i am fine");
-
-                process.nextTick(function mockResponse() {
-                    stdin.send('i am fine\u0004');
-                });
-
-                cliService.askInput("Hello how are u?").then((input)=>{
-
-                    expect(input).to.equal("i am fine");
-                    done();
-                });
+                done();
             })
 
         });
@@ -190,9 +178,7 @@ describe('cli-service Integration Tests', () => {
                 stdin.send('i am fine\n');
             });
 
-            cliService.askInput("Hello how are u?","yellow").then((input)=>{
-
-                expect(stdOutSpy).to.have.been.calledWith(chalk.yellow("Hello how are u?:"));
+            cliService.askInput("Hello how are u?",false,"yellow").then((input)=>{
                 expect(input).to.equal("i am fine");
                 done();
             })
@@ -202,27 +188,14 @@ describe('cli-service Integration Tests', () => {
 
     describe('confirm', () => {
 
-        var stdOutSpy:SinonSpy;
         beforeEach(function () {
-            stdOutSpy = sinon.spy(process.stdout,"write");
             stdin = require('mock-stdin').stdin();
         });
 
         afterEach(()=>{
             stdin.end();
             stdin.reset();
-            stdOutSpy.restore();
         });
-
-        it('should ask user to give yes or no answer', function(done) {
-
-            cliService.confirm("Are we there yet?").then(()=>{
-
-            });
-            expect(stdOutSpy).to.have.been.calledWith("Are we there yet?[y/n]:");
-            done();
-        });
-
 
         it('should return true if the answer is yes or y', function(done) {
             process.nextTick(function mockResponse() {
@@ -274,18 +247,27 @@ describe('cli-service Integration Tests', () => {
 
         it('should re-ask the question if the answer is not yes/no or y/n', function(done) {
 
-            process.nextTick(function mockResponse() {
+            var callCount = 1;
+
+            function mockResponse() {
+
+                callCount++;
+                if(callCount >2)
+                {
+                    stdin.send('y\n');
+                    return
+                }
                 stdin.send('i do not know\n');
-            });
+            }
+
+            process.nextTick(mockResponse);
 
             cliService.confirm("Are we there yet yet?").then((answer)=>{
-
-                expect(stdOutSpy).to.have.been.calledWith("Are we there yet yet?[y/n]:").calledTwice;
                 done();
             });
 
             setTimeout(()=>{
-                stdin.send('y\n');
+                process.nextTick(mockResponse)
             },500)
         });
 

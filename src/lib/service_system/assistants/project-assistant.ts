@@ -58,7 +58,7 @@ function askCredentials():Promise<{username:string,password:string}>
 
             username = result;
 
-            return cliService.askInput("Enter Password").then((result)=>{
+            return cliService.askInput("Enter Password",true).then((result)=>{
                 password = result;
 
                 resolve({username:username,password:password});

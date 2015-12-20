@@ -30,6 +30,7 @@
     "fs-extra": "^0.26.2",
     "github": "^0.2.4",
     "minimist": "^1.2.0",
+    "read": "^1.0.7",
     "which": "^1.2.0"
   },
   "devDependencies": {
