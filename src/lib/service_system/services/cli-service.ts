@@ -19,7 +19,7 @@ export function confirm(question:string,color?:string):Promise<boolean>
         else if (answer.match(/\b(yes|y\b)/i))
             return true;
         else
-            return confirm(question);
+            return confirm(question,color);
     });
 }
 

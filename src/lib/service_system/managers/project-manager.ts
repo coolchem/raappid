@@ -73,6 +73,8 @@ export function createProjectCLI(projectType:string,projectName:string,templateN
                     });
                 }
             },(error)=>{
+                cliService.logError(error.message);
+                cliService.logSuccess("\nProject Created Successfully!!\n");
                 resolve(summary);
             })
         }
