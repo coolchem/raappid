@@ -283,7 +283,7 @@ describe('project-assistant Test cases', () => {
         var shrinkWrapStub:any;
 
         beforeEach(()=>{
-            sanitizeStub = sinon.stub(ps,"sanitizePackageJson");
+            sanitizeStub = sinon.stub(ps,"sanitizePackage");
             instalDepsStup = sinon.stub(ps,"installDependencies");
             shrinkWrapStub = sinon.stub(ps,"shrinkWrapDependencies");
 
