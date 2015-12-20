@@ -19,7 +19,7 @@ export const CLI_HELP_TEXT:string =
 
          template-name: template name refers to the remote repository from which
                         the project will be based on.
-                        If no template name is provided, the default template based on
+                        If no template name is provided, a default template for
                         project type will be used to create the project.
 
                         Examples:

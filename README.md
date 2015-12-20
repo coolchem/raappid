@@ -67,7 +67,7 @@ raappid [project-type] <<project-name>> --using <<template-name>>
     ````
     template-name: template name refers to the remote repository from which
                    the project will be based on.
-                   If no template name is provided, the default template based on
+                   If no template name is provided, a default template for the
                    project type will be used to create the project.
 
                    Examples:
