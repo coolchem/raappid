@@ -127,12 +127,13 @@ describe('repo-service Integration Tests', () => {
         it('should run git add -a and git commit -m in series', function(done) {
 
             repoService.initializeGit(tempProjectDir).then((result)=>{
-                repoService.addAllFilesAndCommit("test Commit",tempProjectDir).then(()=>{
+                repoService.addAllFilesAndCommit("testCommit",tempProjectDir).then(()=>{
+                    fs.removeSync(tempProjectDir);
                     done();
-                    fs.removeSync(tempProjectDir);
+
                 },(error)=>{
-                    done(error);
                     fs.removeSync(tempProjectDir);
+                    done(error);
                 });
             });
 

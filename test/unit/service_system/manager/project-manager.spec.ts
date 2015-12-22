@@ -8,7 +8,6 @@ import fs = require("fs-extra");
 import pm = require("../../../../src/lib/service_system/managers/project-manager");
 import pa = require("../../../../src/lib/service_system/assistants/project-assistant");
 import cliService = require("../../../../src/lib/service_system/services/cli-service");
-import repoService = require("../../../../src/lib/service_system/services/repo-service");
 
 import SinonStub = Sinon.SinonStub;
 import SinonSpy = Sinon.SinonSpy;
@@ -32,7 +31,8 @@ describe('project-manager Test cases', () => {
         var copyTemplateStub:any;
         var initializeProjectStub:any;
         var confirmStub:any;
-        var addRemoteOrginStub:any;
+        var configureRemoteRepoStub:any;
+        var commitAndPushToRemoteStub:any;
 
         beforeEach(()=>{
             validateStub= sinon.stub(pa,"validate");
@@ -41,15 +41,17 @@ describe('project-manager Test cases', () => {
             copyTemplateStub = sinon.stub(pa,"copyTemplate");
             initializeProjectStub = sinon.stub(pa,"initializeProject");
             confirmStub = sinon.stub(cliService,"confirm");
-            addRemoteOrginStub = sinon.stub(repoService,"addRemoteOrigin");
+            configureRemoteRepoStub = sinon.stub(pa,"configureRemoteRepo");
+            commitAndPushToRemoteStub = sinon.stub(pa,"commitAndPushToRemote");
 
             validateStub.resolves(true);
             createProjectDirStub.resolves("testProjectPath");
             copyTemplateStub.resolves(true);
             initializeProjectStub.resolves(true);
             confirmStub.resolves(true);
-            createRemoteRepositoryStub.resolves({username:"test",repoName:"test"});
-            addRemoteOrginStub.resolves(true);
+            createRemoteRepositoryStub.resolves({username:"testUser",password:"testPassword",repoName:"testRepo"});
+            configureRemoteRepoStub.resolves(true);
+            commitAndPushToRemoteStub.resolves(true);
 
         });
         afterEach(()=>{
@@ -59,7 +61,9 @@ describe('project-manager Test cases', () => {
             copyTemplateStub.restore();
             initializeProjectStub.restore();
             confirmStub.restore();
-            addRemoteOrginStub.restore();
+            configureRemoteRepoStub.restore();
+            commitAndPushToRemoteStub.restore();
+
         });
 
         it("should do validation",()=>{
@@ -164,10 +168,11 @@ describe('project-manager Test cases', () => {
 
         });
 
-        it("should resolve with summary, after creating remote repository and adding git remote",(done)=>{
+        it("should resolve with summary, after creating, configuring and pushing to a remote repo",(done)=>{
 
             pm.createProjectCLI("test","testProject").then((result)=>{
-                expect(addRemoteOrginStub).to.have.been.calledWith("test","test","testProjectPath").calledOnce;
+                expect(configureRemoteRepoStub).to.have.been.calledWith("testUser","testPassword","testRepo","testProjectPath").calledOnce;
+                expect(commitAndPushToRemoteStub).to.have.been.calledWith("testProjectPath");
                 expect(result).to.be.instanceOf(Array);
                 done();
             });

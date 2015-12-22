@@ -236,6 +236,67 @@ describe('project-assistant Test cases', () => {
 
     });
 
+    describe("commitAndPushToRemote",()=>{
+
+        var addAndCommitStub:any;
+        var pushOriginMasterStub:any;
+
+        beforeEach(()=>{
+            addAndCommitStub = sinon.stub(repoService,"addAllFilesAndCommit");
+            pushOriginMasterStub = sinon.stub(repoService,"pushOriginMaster");
+        });
+
+        afterEach(()=>{
+            addAndCommitStub.restore();
+            pushOriginMasterStub.restore();
+        });
+
+
+        it("should resolve successfully when add commit and push is successful",(done)=>{
+
+            addAndCommitStub.resolves(true);
+            pushOriginMasterStub.resolves(true);
+            pa.commitAndPushToRemote("testDirectory").then(()=>{
+
+                expect(addAndCommitStub).to.have.been.calledWith("First Commit","testDirectory");
+                expect(pushOriginMasterStub).to.have.been.calledWith("testDirectory");
+                done();
+            });
+        });
+
+    });
+
+    describe("configureRemoteRepo",()=>{
+
+        var getUsersPrimaryEmailStub:any;
+        var configureGitStub:any;
+
+        beforeEach(()=>{
+            getUsersPrimaryEmailStub = sinon.stub(repoService,"getUsersPrimaryEmail");
+            configureGitStub = sinon.stub(repoService,"configureGit");
+        });
+
+        afterEach(()=>{
+            getUsersPrimaryEmailStub.restore();
+            configureGitStub.restore();
+        });
+
+
+        it("should resolve successfully when userEmail is obtained and gitConfiguration is successful",(done)=>{
+
+            getUsersPrimaryEmailStub.resolves("testEmail");
+            configureGitStub.resolves(true);
+            pa.configureRemoteRepo("testUsername","testPassword","testRepo","testDir").then(()=>{
+
+                expect(getUsersPrimaryEmailStub).to.have.been.calledWith("testUsername","testPassword");
+                expect(configureGitStub).to.have.been.calledWith("testUsername","testEmail","testRepo","testDir");
+                done();
+            });
+        });
+
+    });
+
+
     describe("copyTemplate",()=>{
 
         var downloadStub:any;
