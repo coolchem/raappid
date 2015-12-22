@@ -117,28 +117,6 @@ describe('repo-service Integration Tests', () => {
 
     });
 
-    describe('addAllFilesAndCommit', () => {
-
-        var tempProjectDir:string = path.resolve("./test/tempProject");
-        fs.mkdirsSync(tempProjectDir);
-        fs.writeFileSync(tempProjectDir+"/package.json",JSON.stringify({version:"0.0.1",devDependencies:{typescript:"^1.7"}}, null, '  ') + '\n');
-
-
-        it('should run git add -a and git commit -m in series', function(done) {
-
-            repoService.initializeGit(tempProjectDir).then((result)=>{
-                repoService.addAllFilesAndCommit("testCommit",tempProjectDir).then(()=>{
-                    fs.removeSync(tempProjectDir);
-                    done();
-
-                },(error)=>{
-                    fs.removeSync(tempProjectDir);
-                    done(error);
-                });
-            });
-
-        });
-    });
 
     describe('createRemoteRepository', () => {
 
