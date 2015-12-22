@@ -5,21 +5,6 @@
 import pa = require("../assistants/project-assistant");
 import cliService = require("../services/cli-service");
 import fs = require("fs-extra");
-import repoService = require("../services/repo-service");
-
-
-
-export const ERROR_USER_CANCELED_CREATE_PROJECT:string = "Error Creating Project: User canceled project creation";
-
-export const MESSAGE_CONTINUE_WITH_LOCAL_GIT_REPO =
-`It Seems there is an issue creating your #repo-type repository.
-
-you can hook in remote git repository at later time.
-
-if you do not want to create the project, please answer No to below question.
-
-Would you like to continue creating the project as a local git repository?`;
-
 
 function logStep(message:string,isStaring:boolean = true):string
 {
@@ -30,7 +15,51 @@ function logStep(message:string,isStaring:boolean = true):string
     return cliService.logSuccess(message+"\n");
 }
 
-//todo: an effective refactor of the function below
+function confirmCreatingRemoteRepo(resolve,projectName:string,projectDirectory:string,summary:string[]):void
+{
+    pa.createRemoteRepository(projectName).then((result:{username:string,password:string,repoName:string})=>{
+        if(!result)
+        {
+            cliService.logSuccess("\nProject Created Successfully!!\n");
+            resolve(summary);
+        }
+        else
+        {
+
+            pa.configureRemoteRepo(result.username,result.password,result.repoName,projectDirectory)
+                .then(()=>{
+
+                    pa.commitAndPushToRemote(projectDirectory).then(()=>{
+
+                        cliService.logSuccess("\nProject Created Successfully!!\n");
+                        resolve(summary);
+
+                    },(error)=>{
+
+                        cliService.logError(error.message);
+                        cliService.logSuccess("\nProject Created Successfully!!\n");
+                        resolve(summary);
+
+                    })
+
+                },(error)=>{
+
+                    cliService.logError(error.message);
+                    cliService.logSuccess("\nProject Created Successfully!!\n");
+                    resolve(summary);
+
+                });
+        }
+    },(error)=>{
+
+        cliService.logError(error.message);
+        cliService.logSuccess("\nProject Created Successfully!!\n");
+        resolve(summary);
+
+    })
+}
+
+//todo: an effective refactor of the monstrosity below
 export function createProjectCLI(projectType:string,projectName:string,templateName?:string):Promise<string[]>{
 
 
@@ -39,46 +68,6 @@ export function createProjectCLI(projectType:string,projectName:string,templateN
 
         var projectDirectory:string;
         var summary:string[] = [];
-
-        function doRejection(error){
-
-            try {
-                // Query the entry
-                fs.lstatSync(projectDirectory);
-
-                fs.removeSync(projectDirectory);
-            }
-            catch (e) {
-                //means project directory was not created
-            }
-
-            cliService.logError(error.message);
-            reject(error);
-        }
-
-        function confirmCreatingRemoteRepo():void
-        {
-            pa.createRemoteRepository(projectName).then((result:{username:string,repoName:string})=>{
-                if(!result)
-                {
-                    cliService.logSuccess("\nProject Created Successfully!!\n");
-                    resolve(summary);
-                }
-                else
-                {
-                    repoService.addRemoteOrigin(result.username,result.repoName,projectDirectory)
-                    .then(()=>{
-                        cliService.logSuccess("\nProject Created Successfully!!\n");
-                        resolve(summary);
-                    });
-                }
-            },(error)=>{
-                cliService.logError(error.message);
-                cliService.logSuccess("\nProject Created Successfully!!\n");
-                resolve(summary);
-            })
-        }
-
 
         logStep("Validating...");
 
@@ -107,12 +96,30 @@ export function createProjectCLI(projectType:string,projectName:string,templateN
                                     .then(()=>{
 
                                         logStep("Project initialized.",false);
-                                        confirmCreatingRemoteRepo();
+                                        confirmCreatingRemoteRepo(resolve,projectName,projectDirectory,summary);
                                     },doRejection);
 
                             },doRejection);
                     },doRejection);
             },doRejection);
+
+
+        function doRejection(error){
+
+            try {
+                // Query the entry
+                fs.lstatSync(projectDirectory);
+
+                fs.removeSync(projectDirectory);
+            }
+            catch (e) {
+                //means project directory was not created
+            }
+
+            cliService.logError(error.message);
+            reject(error);
+        }
+
     });
 
 }

@@ -144,7 +144,7 @@ describe('repo-service Test cases', () => {
             shellStub.resolves(true);
             repoService.addAllFilesAndCommit("testCommit","directoryPath").then(()=>{
 
-                expect(shellStub).to.have.been.calledWith(["git add -A",'git commit -m ' + '"'+"testCommit" +'"'],"directoryPath");
+                expect(shellStub).to.have.been.calledWith(["git add -A",'git commit -m "testCommit"'],"directoryPath");
                 done();
             });
 
@@ -156,6 +156,89 @@ describe('repo-service Test cases', () => {
             repoService.addAllFilesAndCommit("testCommit","directoryPath").then(null,(error)=>{
 
                 expect(shellStub).to.have.been.calledWith(["git add -A",'git commit -m ' + '"'+"testCommit" +'"'],"directoryPath");
+                expect(error).to.be.instanceOf(Error);
+                expect(error.message).to.equal("yay");
+                done();
+            });
+
+
+        });
+    });
+
+    describe('pushOriginMaster', () => {
+
+        var shellStub;
+        beforeEach(()=>{
+            shellStub = sinon.stub(shell,"exec");
+
+        });
+
+        afterEach(()=>{
+            shellStub.restore();
+        });
+
+
+        it('should run git push', function(done) {
+
+            shellStub.resolves(true);
+            repoService.pushOriginMaster("directoryPath").then(()=>{
+
+                expect(shellStub).to.have.been.calledWith("git push -u origin master","directoryPath");
+                done();
+            });
+
+        });
+
+        it('should reject with error if there was any issue', function(done) {
+
+            shellStub.rejects(new Error("yay"));
+            repoService.pushOriginMaster("directoryPath").then(null,(error)=>{
+
+                expect(shellStub).to.have.been.calledWith("git push -u origin master","directoryPath");
+                expect(error).to.be.instanceOf(Error);
+                expect(error.message).to.equal("yay");
+                done();
+            });
+
+
+        });
+    });
+
+    describe('configureGit', () => {
+
+        var shellStub;
+        beforeEach(()=>{
+            shellStub = sinon.stub(shell,"series");
+
+        });
+
+        afterEach(()=>{
+            shellStub.restore();
+        });
+
+
+        it('should add remote origin and configer user', function(done) {
+
+            shellStub.resolves(true);
+            repoService.configureGit("test","testEmail","testRepo","directoryPath").then(()=>{
+
+                expect(shellStub).to.have.been.calledWith(['git config user.email "testEmail"',
+                    'git config user.name "test"',
+                    "git remote add origin https://github.com/test/testRepo.git"],"directoryPath");
+                done();
+            });
+
+        });
+
+        it('should reject with error if there was any issue', function(done) {
+
+            shellStub.rejects(new Error("yay"));
+            repoService.configureGit("test","testEmail","testRepo","directoryPath").then(null,(error)=>{
+
+                expect(shellStub).to.have.been.calledWith(['git config user.email "testEmail"',
+                    'git config user.name "test"',
+                    "git remote add origin https://github.com/test/testRepo.git"],"directoryPath");
+
                 expect(error).to.be.instanceOf(Error);
                 expect(error.message).to.equal("yay");
                 done();

@@ -164,7 +164,7 @@ describe('project-assistant Test cases', () => {
 
         it('should ask user to choose a new repo name, if the repo already exists', function(done) {
 
-            createRemoteRepositoryStub.onFirstCall().rejects({code:422,message:{message:"Validation Failed"}});
+            createRemoteRepositoryStub.onFirstCall().rejects({code:422,message:'{"message":"Validation Failed"}'});
             createRemoteRepositoryStub.onSecondCall().resolves({});
 
             pa.createRemoteRepository("humm").then((result)=>{
@@ -178,9 +178,9 @@ describe('project-assistant Test cases', () => {
 
         it('should reject after 3 attempts at creating repository with a new repo name', function(done) {
 
-            createRemoteRepositoryStub.onFirstCall().rejects({code:422,message:{message:"Validation Failed"}});
-            createRemoteRepositoryStub.onSecondCall().rejects({code:422,message:{message:"Validation Failed"}});
-            createRemoteRepositoryStub.onThirdCall().rejects({code:422,message:{message:"Validation Failed"}});
+            createRemoteRepositoryStub.onFirstCall().rejects({code:422,message:'{"message":"Validation Failed"}'});
+            createRemoteRepositoryStub.onSecondCall().rejects({code:422,message:'{"message":"Validation Failed"}'});
+            createRemoteRepositoryStub.onThirdCall().rejects({code:422,message:'{"message":"Validation Failed"}'});
 
             pa.createRemoteRepository("humm").then(null,(error)=>{
                 expect(createRemoteRepositoryStub).to.have.been.calledThrice;
@@ -193,7 +193,7 @@ describe('project-assistant Test cases', () => {
 
         it('should reject, if create repository fails for any  other reasons', function(done) {
 
-            createRemoteRepositoryStub.rejects(new Error("yay"));
+            createRemoteRepositoryStub.rejects({code:433,message:'{"message":"Validation Failed"}'});
 
             pa.createRemoteRepository("humm").then(null,(error)=>{
                 expect(createRemoteRepositoryStub).to.have.been.calledOnce;

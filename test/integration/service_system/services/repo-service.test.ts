@@ -117,6 +117,27 @@ describe('repo-service Integration Tests', () => {
 
     });
 
+    describe('addAllFilesAndCommit', () => {
+
+        var tempProjectDir:string = path.resolve("./test/tempProject");
+        fs.mkdirsSync(tempProjectDir);
+        fs.writeFileSync(tempProjectDir+"/package.json",JSON.stringify({version:"0.0.1",devDependencies:{typescript:"^1.7"}}, null, '  ') + '\n');
+
+
+        it('should run git add -a and git commit -m in series', function(done) {
+
+            repoService.initializeGit(tempProjectDir).then((result)=>{
+                repoService.addAllFilesAndCommit("test Commit",tempProjectDir).then(()=>{
+                    done();
+                    fs.removeSync(tempProjectDir);
+                },(error)=>{
+                    done(error);
+                    fs.removeSync(tempProjectDir);
+                });
+            });
+
+        });
+    });
 
     describe('createRemoteRepository', () => {
 
@@ -134,6 +155,38 @@ describe('repo-service Integration Tests', () => {
                     repoService.github.repos.delete({user:user[0],repo:"test"},()=>{
                         done();
                     })
+
+                },(error)=>{
+
+                    done(error);
+
+                });
+            }
+            else
+            {
+                done()
+            }
+
+
+        });
+
+    });
+
+    describe('getUserEmail', () => {
+
+
+        it('should get the user email', function(done) {
+
+            this.timeout(30000);
+            loadEnv();
+            if(process.env.TEST_GITHUB)
+            {
+                var user:string[] = process.env.TEST_GITHUB.split(':');
+
+                repoService.getUsersPrimaryEmail(user[0],user[1]).then((result)=>{
+
+                    expect(result).to.not.equal("");
+                    done();
 
                 },(error)=>{
 

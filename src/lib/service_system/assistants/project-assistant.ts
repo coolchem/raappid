@@ -4,6 +4,8 @@
 import ps = require("../services/project-service");
 import repoService = require("../services/repo-service");
 import cliService = require("../services/cli-service");
+import reject = Promise.reject;
+import {error} from "util";
 
 var fs = require("fs-extra");
 
@@ -111,6 +113,20 @@ export function validate(projectType:string,projectName:string):Promise<boolean>
     });
 }
 
+export function configureRemoteRepo(username:string,password:string,repoName:string,projectDir:string):Promise<any>{
+
+    return new Promise((resolve,reject)=>{
+
+        repoService.getUsersPrimaryEmail(username,password)
+        .then((userEmail)=>{
+
+            repoService.configureGit(username,userEmail,repoName,projectDir)
+            .then(resolve,reject);
+
+        },reject)
+    });
+}
+
 export function createRemoteRepository(projectName:string):Promise<{username:string,repoName:string}>
 {
 
@@ -152,7 +168,7 @@ export function createRemoteRepository(projectName:string):Promise<{username:str
             repoService.createRemoteRepository(username,password,repoName)
                 .then(()=>{
 
-                    resolve({username:username,repoName:repoName});
+                    resolve({username:username,password:password,repoName:repoName});
 
                 },(error)=>{
 
@@ -174,25 +190,29 @@ export function createRemoteRepository(projectName:string):Promise<{username:str
                             doRejection(error);
                         }
                     }
-                    else if(error.code == 422 && error.message.message == "Validation Failed")
+                    else
                     {
-                        repoNameValidationFailCount++;
-
-                        if(repoNameValidationFailCount < 3)
+                        var message:any = JSON.parse(error.message);
+                        if(error.code == 422 && message.message == "Validation Failed")
                         {
-                            askToEnterNewRepoName(repoName).then((repo)=>{
-                                repoName = repo;
-                                createRepo();
-                            })
+                            repoNameValidationFailCount++;
+
+                            if(repoNameValidationFailCount < 3)
+                            {
+                                askToEnterNewRepoName(repoName).then((repo)=>{
+                                    repoName = repo;
+                                    createRepo();
+                                })
+                            }
+                            else
+                            {
+                                doRejection(error);
+                            }
                         }
                         else
                         {
                             doRejection(error);
                         }
-                    }
-                    else
-                    {
-                        doRejection(error);
                     }
                 });
         }
@@ -206,6 +226,20 @@ export function createRemoteRepository(projectName:string):Promise<{username:str
     });
 
 
+}
+
+export function commitAndPushToRemote(projectDirectory:string):Promise<boolean>
+{
+    return new Promise((resolve,reject)=>{
+
+        repoService.addAllFilesAndCommit("First Commit",projectDirectory)
+        .then(()=>{
+
+            repoService.pushOriginMaster(projectDirectory)
+            .then(resolve,reject);
+
+        },reject)
+    })
 }
 
 export function createProjectDirectory(projectName:string):Promise<string>
