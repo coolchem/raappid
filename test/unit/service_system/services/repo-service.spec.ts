@@ -395,6 +395,34 @@ describe('repo-service Test cases', () => {
 
     });
 
+    describe('getUsersPrimaryEmail', () => {
+
+        var spy:SinonSpy;
+        var stub:any;
+        beforeEach(function () {
+            stub = sinon.stub(repoService.github.user, "getEmails");
+        });
+        afterEach(function () {
+            stub.restore();
+        });
+
+        it('should reject with error, if get user email returns error', (done)=> {
+
+            stub.yields(new Error("yay"));
+            repoService.getUsersPrimaryEmail("test","test").then(()=>{},(error)=>{
+
+                expect(stub).to.have.been.calledWith({});
+                expect(error).to.be.instanceOf(Error);
+                expect(error.message).to.equal("yay");
+                done();
+
+            });
+
+
+        });
+
+    });
+
 
 });
 

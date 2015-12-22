@@ -151,7 +151,7 @@ describe('repo-service Integration Tests', () => {
 
     });
 
-    describe('getUserEmail', () => {
+    describe('getUsersPrimaryEmail', () => {
 
 
         it('should get the user email', function(done) {

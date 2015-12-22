@@ -179,6 +179,28 @@ describe('project-manager Test cases', () => {
 
         });
 
+        it("should resolve with summary, if create configuring remote repo step fails",(done)=>{
+
+            configureRemoteRepoStub.rejects(new Error("yay"));
+
+            pm.createProjectCLI("test","testProject").then((result)=>{
+                expect(result).to.be.instanceOf(Array);
+                done();
+            });
+
+        });
+
+        it("should resolve with summary, if commit and push step fails",(done)=>{
+
+            commitAndPushToRemoteStub.rejects(new Error("yay"));
+
+            pm.createProjectCLI("test","testProject").then((result)=>{
+                expect(result).to.be.instanceOf(Array);
+                done();
+            });
+
+        });
+
         it("should resolve with summary, if create remote repo step fails",(done)=>{
 
             createRemoteRepositoryStub.rejects(new Error("yay"));
