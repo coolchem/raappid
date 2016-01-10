@@ -1,0 +1,10 @@
+
+dependencies:
+  override:
+    - npm run install-deps
+
+test:
+  override:
+    - nvm use 5.0.0 && npm test
+    - nvm use 5.1.0 && npm test
+
