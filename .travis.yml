@@ -5,6 +5,7 @@ node_js:
   - "5.1.0"
 install:
   - npm install
+  - npm run install-other-dependencies
 
 after_script:
   - npm run coverage
