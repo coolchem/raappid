@@ -10,7 +10,7 @@ if(argv._ && argv._.length > 0) //look release build
     util.series(["npm test",
         "npm run build-release",
         cmd,
-        "git config credential.helper 'cache'",
+        "git config credential.helper cache",
         "git push","git push --tags"],function(err){
         if(err)
         {
