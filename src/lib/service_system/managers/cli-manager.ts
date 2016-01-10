@@ -4,6 +4,8 @@ import cliService = require("../services/cli-service");
 export const CLI_HELP_TEXT:string =
     `Command:
 
+         raappid -v or  --version  ( gives the version of raappid application)
+
          raappid [project-type] <<project-name>> --using <<template-name>>
 
          Options:
@@ -53,6 +55,12 @@ export function processArguments(argv:any):{projectType:string,
     if(argv.help === true || argv.h === true)
     {
         cliService.log(CLI_HELP_TEXT);
+        return null;
+    }
+
+    if(argv.v === true || argv.version === true)
+    {
+        cliService.logVersion();
         return null;
     }
 

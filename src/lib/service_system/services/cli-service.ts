@@ -1,8 +1,8 @@
 /// <reference path="../../../typings/tsd.d.ts" />
 
-
+import fs = require("fs-extra");
 import chalk = require('chalk');
-
+import path = require("path");
 
 var read = require("read");
 chalk.enabled = true;
@@ -10,6 +10,13 @@ chalk.enabled = true;
 export const ERROR_UNSUPPORTED_COLOR:string = `Error logging message: The color sent to log the message unsupported
                                                Please send one of the following colors: red,blue,green,yellow`;
 
+export function logVersion():string
+{
+
+    var version:string = JSON.parse(fs.readFileSync(path.resolve("./package.json"), 'utf8')).version;
+    log(version);
+    return version;
+}
 export function confirm(question:string,color?:string):Promise<boolean>
 {
     var questionNew = question + '[y/n]';

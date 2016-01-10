@@ -35,6 +35,12 @@ describe('cli-manager Test cases', () => {
             expect(cm.processArguments({h:true,_:["asdad","asdsad","adadad"]})).to.be.null;
         });
 
+        it("should return null if user requests version",()=>{
+
+            expect(cm.processArguments({v:true,_:["asdad","asdsad","adadad"]})).to.be.null;
+            expect(cm.processArguments({version:true,_:["asdad","asdsad","adadad"]})).to.be.null;
+        });
+
         it("should resolve object containing projectName, projectType and templateName",()=>{
 
             var result = cm.processArguments({_:["asdad","asdsad"],using:"sdfsfsf"});

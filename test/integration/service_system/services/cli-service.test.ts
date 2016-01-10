@@ -1,10 +1,12 @@
 /// <reference path="../../../../src/typings/tsd.d.ts" />
 
+import fs = require("fs-extra");
 import chai = require('chai');
 import sinon = require('sinon');
 import chalk = require('chalk');
 import cliService =require("../../../../src/lib/service_system/services/cli-service");
 import SinonSpy = Sinon.SinonSpy;
+import path = require("path");
 
 var read = require("read");
 
@@ -24,6 +26,22 @@ describe('cli-service Integration Tests', () => {
     });
     afterEach(()=>{
        logSpy.restore();
+    });
+
+    describe('getVersion', () => {
+
+        it('should return the version no of package.json present in the directory', function() {
+
+
+            var pkgVersion:string = JSON.parse(fs.readFileSync(path.resolve("./package.json"), 'utf8')).version;
+
+            var version:string = cliService.logVersion();
+            expect(logSpy).to.have.been.calledWith(pkgVersion);
+            expect(version).to.equal(pkgVersion);
+
+
+        });
+
     });
 
     describe('log', () => {
