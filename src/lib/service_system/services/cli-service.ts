@@ -13,7 +13,7 @@ export const ERROR_UNSUPPORTED_COLOR:string = `Error logging message: The color 
 export function logVersion():string
 {
 
-    var version:string = JSON.parse(fs.readFileSync(path.resolve("./package.json"), 'utf8')).version;
+    var version:string = JSON.parse(fs.readFileSync(path.resolve(__dirname,"../../../../package.json"), 'utf8')).version;
     log(version);
     return version;
 }
