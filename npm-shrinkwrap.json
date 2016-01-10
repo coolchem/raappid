@@ -1,6 +1,6 @@
 {
   "name": "raappid",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "dependencies": {
     "abbrev": {
       "version": "1.0.7",
