@@ -81,9 +81,9 @@ export function installDependencies(projectDirectoryPath:string):Promise<boolean
         shell.exec("npm install",projectDirectoryPath).then((result)=>{
 
             try {
-                fs.lstatSync(projectDirectoryPath+"/scripts/install.js");
+                fs.lstatSync(projectDirectoryPath+"/scripts/install-other-dependencies.js");
 
-                var cmd = "node " + projectDirectoryPath+ "/scripts/install.js";
+                var cmd = "node " + projectDirectoryPath+ "/scripts/install-other-dependencies.js";
 
                 shell.exec(cmd,projectDirectoryPath).then((result)=>{
                     resolve(result);
@@ -145,7 +145,7 @@ export function sanitizePackage(projectName:string, projectDirectory:string):Obj
 }
 
 export function shrinkWrapDependencies(projecDirectory:string):Promise<any>{
-    return shell.exec("npm shrinkwrap",projecDirectory);
+    return shell.exec("npm shrinkwrap --dev",projecDirectory);
 }
 
 

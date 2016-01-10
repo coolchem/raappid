@@ -210,9 +210,9 @@ describe('project-service Test cases', () => {
             });
         });
 
-        it('should run the install.js if it is present in the scripts folder', function(done) {
+        it('should run the install-other-dependencies.js if it is present in the scripts folder', function(done) {
 
-            fs.writeFileSync(tempProjectDir +"/scripts/install.js",
+            fs.writeFileSync(tempProjectDir +"/scripts/install-other-dependencies.js",
                 `
                  console.log('yay')
                 `);
@@ -220,13 +220,13 @@ describe('project-service Test cases', () => {
             ps.installDependencies(tempProjectDir).then((result)=> {
 
 
-                expect(stubExec).to.have.been.calledWith("node " + tempProjectDir + "/scripts/install.js", tempProjectDir);
+                expect(stubExec).to.have.been.calledWith("node " + tempProjectDir + "/scripts/install-other-dependencies.js", tempProjectDir);
                 done();
             });
 
         });
 
-        it('should resolve to true if install.js was not found', function(done) {
+        it('should resolve to true if install-other-dependencies.js was not found', function(done) {
 
             stubExec.resolves(true);
 
@@ -239,12 +239,12 @@ describe('project-service Test cases', () => {
             });
         });
 
-        it('should reject with error if install.js script has error', function(done) {
+        it('should reject with error if install-other-dependencies.js script has error', function(done) {
 
             stubExec.onCall(0).resolves(true);
             stubExec.onCall(1).rejects(new Error("humm"));
 
-            fs.writeFileSync(tempProjectDir +"/scripts/install.js",
+            fs.writeFileSync(tempProjectDir +"/scripts/install-other-dependencies.js",
                 `
                  console.log('yay')
                 `);
