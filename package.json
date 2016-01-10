@@ -54,7 +54,7 @@
     "dist"
   ],
   "scripts": {
-    "install-other-dependencies": "node scripts/install-other-dependencies.js",
+    "install-deps": "npm install && node scripts/install-other-dependencies.js",
     "clean": "node scripts/clean.js",
     "build": "node scripts/build.js",
     "build-release": "npm run build release",
