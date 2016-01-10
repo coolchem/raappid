@@ -73,7 +73,7 @@ function askCredentials():Promise<{username:string,password:string}>
 function askToReEnterCredentials():Promise<{username:string,password:string}>
 {
     cliService.logError(ERROR_CREATING_REPO_BAD_CREDENTIALS.replace("#repo-type","GitHub"));
-    cliService.log(MESSAGE_RE_ENTER_CREDENTIALS,"blue");
+    cliService.log(MESSAGE_RE_ENTER_CREDENTIALS,"yellow");
 
     return askCredentials();
 }
@@ -81,7 +81,7 @@ function askToReEnterCredentials():Promise<{username:string,password:string}>
 function askToEnterNewRepoName(repoName:string):Promise<string>
 {
     cliService.logError(MESSAGE_REPO_NAME_ALREADY_EXISTS.replace("#repo-type","GitHub").replace("#repo-name",repoName));
-    cliService.log(MESSAGE_ENTER_REPO_NAME,"blue");
+    cliService.log(MESSAGE_ENTER_REPO_NAME,"yellow");
 
     return cliService.askInput("Enter New Repository Name");
 }
@@ -140,7 +140,7 @@ export function createRemoteRepository(projectName:string):Promise<{username:str
         var repoNameValidationFailCount:number = 0;
 
         //ask user if they want to create github repo
-        cliService.confirm(MESSAGE_CREATE_REMOTE_REPO.replace("#repo-type","GitHub"),"blue").then((result)=>{
+        cliService.confirm(MESSAGE_CREATE_REMOTE_REPO.replace("#repo-type","GitHub"),"yellow").then((result)=>{
 
             if(result)
             {

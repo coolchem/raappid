@@ -21,7 +21,7 @@ describe('shell-util Integration Tests', () => {
         spyExec = sinon.spy(require('child_process'),"spawn");
 
         fs.mkdirs(tempProjectDir, function (err) {
-            fs.writeFileSync(tempProjectDir+"/package.json",JSON.stringify({version:"0.0.1",  devDependencies: {"typescript": "^1.7"}}, null, '  ') + '\n');
+            fs.writeFileSync(tempProjectDir+"/package.json",JSON.stringify({version:"0.0.1",  devDependencies: {"del": "^2.0.2"}}, null, '  ') + '\n');
             fs.mkdirsSync(tempProjectDir+"/scripts");
             fs.writeFileSync(tempProjectDir +"/scripts/install1.js",
                 `

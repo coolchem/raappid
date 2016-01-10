@@ -3,6 +3,7 @@ language: node_js
 node_js:
   - "5.0.0"
   - "5.1.0"
+  - "5.4.0"
 install:
   - npm run install-deps
 

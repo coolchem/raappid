@@ -37,10 +37,10 @@ describe('project-manager Integration Tests', () => {
 
             var copyStub:any = sinon.stub(pa,"copyTemplate");
             copyStub.rejects(new Error("yay"));
-            pm.createProjectCLI("basic","myProject1").then(null,(error)=>{
+            pm.createProjectCLI("basic","myProject").then(null,(error)=>{
                 copyStub.restore();
                 try {
-                    var stats = fs.lstatSync(process.cwd()+"/myProject1");
+                    var stats = fs.lstatSync(process.cwd()+"/myProject");
                     if (stats.isDirectory()) {
                         done("Directory Should not Have existed\n");
                     }
