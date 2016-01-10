@@ -2,7 +2,7 @@
 
 var util = require('./util');
 
-util.series(["npm install", "tsd install"],function(error){
+util.exec("tsd install",function(error){
 
     if(error)
     {
