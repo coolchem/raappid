@@ -42,7 +42,6 @@ describe('project-service Integration Tests', () => {
 
                 try {
                     var stats = fs.lstatSync(tempProjectDir+"/node_modules/template-basic");
-                    expect(result).to.equal(tempProjectDir+"/node_modules/template-basic");
                     if (stats.isDirectory()) {
                         done();
                     }

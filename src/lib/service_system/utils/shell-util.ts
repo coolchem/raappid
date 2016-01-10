@@ -3,13 +3,13 @@
 export function exec(cmd:string,cwd?:string):Promise<boolean>{
 
     return new Promise((resolve,reject)=>{
-        var child_process = require('child_process');
+        var spawn = require('cross-spawn-async');
 
         var parts = [].concat.apply([], cmd.split('"').map(function(v,i){
             return i%2 ? '"'+v+'"' : v.split(' ')
         })).filter(Boolean);
 
-        var p = child_process.spawn(parts[0], parts.slice(1), getOptions(cwd));
+        var p = spawn(parts[0], parts.slice(1), getOptions(cwd));
 
         p.on('exit', function(code){
             var err = null;

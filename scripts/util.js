@@ -8,9 +8,9 @@
 // execute a single shell command where "cmd" is a string
 exports.exec = function(cmd, cb){
     // this would be way easier on a shell/bash script :P
-    var child_process = require('child_process');
+    var spawn = require('cross-spawn-async');
     var parts = cmd.split(/\s+/g);
-    var p = child_process.spawn(parts[0], parts.slice(1), {stdio: 'inherit'});
+    var p = spawn(parts[0], parts.slice(1), {cwd:process.cwd(),stdio: 'inherit'});
 
     p.on('exit', function(code){
         var err = null;

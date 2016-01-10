@@ -33,12 +33,14 @@ describe('project-manager Integration Tests', () => {
         });
         it("should remove project directory, while rejecting with error",function (done){
 
+            this.timeout(120000);
+
             var copyStub:any = sinon.stub(pa,"copyTemplate");
             copyStub.rejects(new Error("yay"));
-            pm.createProjectCLI("basic","myProject").then(null,(error)=>{
+            pm.createProjectCLI("basic","myProject1").then(null,(error)=>{
                 copyStub.restore();
                 try {
-                    var stats = fs.lstatSync(process.cwd()+"/myProject");
+                    var stats = fs.lstatSync(process.cwd()+"/myProject1");
                     if (stats.isDirectory()) {
                         done("Directory Should not Have existed\n");
                     }

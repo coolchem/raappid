@@ -19,7 +19,7 @@ else //do dev build
 
 function build(isRelease){
 
-    var cmd = "node_modules/.bin/tsc";
+    var cmd = "tsc";
 
     if(isRelease)
         cmd = cmd + " -p src --outDir dist";
