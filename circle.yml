@@ -1,14 +1,6 @@
 
-machine:
-  node:
-    version: 5.0.0
-
-dependencies:
-  override:
-    - npm run install-deps
-
 test:
   override:
-    - nvm use 5.0.0 && npm test
-    - nvm use 5.1.0 && npm test
+    - nvm use 5.0.0 && npm run install-deps && npm test
+    - nvm use 5.0.0 && npm run install-deps && npm test
 
