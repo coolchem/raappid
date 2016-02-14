@@ -26,7 +26,7 @@ export function validateProjectName(name:string):boolean
 export function downloadTemplate(projectType:string,projectDirectoryPath:string,templateName:string = ""):Promise<string>
 {
 
-    var cmd:string = "npm install ";
+    var cmd:string = "git clone ";
 
     if(projectType == PROJECT_TYPE_BASIC)
     {
@@ -49,27 +49,49 @@ export function downloadTemplate(projectType:string,projectDirectoryPath:string,
         }
     }
 
+    var names:string[] = templateName.split(":");
+    var repoHostName:string = "github.com";
+    var repoName:string = "";
+    if(names.length == 2)
+    {
+        templateName = names[1];
+        var repoInfo:string[] = names[1].split("/");
+
+        if(names[0] == "bitbucket")
+        {
+
+            //coolchem@bitbucket.org
+            repoHostName=repoInfo[0]+"@bitbucket.org";
+        }
+        else
+        {
+            repoHostName = names[0]+".com";
+        }
+        repoName = repoInfo[1];
+
+    }
+    else
+    {
+        repoName = templateName.split("/")[1];
+    }
+
+    templateName = "https://"+repoHostName+"/"+templateName+".git";
+
     cmd += templateName;
 
     return new Promise((resolve,reject)=>{
 
         shell.exec(cmd,projectDirectoryPath).then(()=>{
 
-            var templatePath:string = getTemplatePath(projectDirectoryPath);
+            var templatePath:string = projectDirectoryPath+"/"+repoName;
+
+            fs.removeSync(templatePath+"/.git");
             resolve(templatePath);
         },(error)=>{
             reject(error);
         })
     });
 
-}
-
-function getTemplatePath(projectDirectoryPath:string):string
-{
-    var nodeModulesPath:string = projectDirectoryPath+"/node_modules";
-    var files = fs.readdirSync(nodeModulesPath);
-
-    return path.join(nodeModulesPath,files[0]);
 }
 
 export function installDependencies(projectDirectoryPath:string):Promise<boolean>

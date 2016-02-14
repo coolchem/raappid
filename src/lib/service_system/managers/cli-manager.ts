@@ -25,7 +25,6 @@ export const CLI_HELP_TEXT:string =
                         project type will be used to create the project.
 
                         Examples:
-                        npm-package-name
                         githubname/reponame
                         bitbucket:mybitbucketuser/myproject
                         gitlab:mygitlabuser/myproject

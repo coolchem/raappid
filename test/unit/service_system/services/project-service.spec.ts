@@ -92,7 +92,7 @@ describe('project-service Test cases', () => {
             stubExec.resolves(true);
             ps.downloadTemplate("basic",tempProjectDir).then(()=>{
 
-                expect(stubExec).to.have.been.calledWith("npm install raappid/template-basic", tempProjectDir);
+                expect(stubExec).to.have.been.calledWith("git clone https://github.com/raappid/template-basic.git", tempProjectDir);
 
                 done();
             });
@@ -105,23 +105,23 @@ describe('project-service Test cases', () => {
             ps.downloadTemplate("node-app",tempProjectDir).then(()=>{
 
 
-                expect(stubExec).to.have.been.calledWith("npm install raappid/template-node-app-basic", tempProjectDir);
+                expect(stubExec).to.have.been.calledWith("git clone https://github.com/raappid/template-node-app-basic.git", tempProjectDir);
 
 
                 ps.downloadTemplate("web-app",tempProjectDir).then(()=>{
 
-                    expect(stubExec).to.have.been.calledWith("npm install raappid/template-web-app-basic", tempProjectDir);
+                    expect(stubExec).to.have.been.calledWith("git clone https://github.com/raappid/template-web-app-basic.git", tempProjectDir);
 
 
 
                     ps.downloadTemplate("template",tempProjectDir).then(()=>{
 
-                        expect(stubExec).to.have.been.calledWith("npm install raappid/template-basic", tempProjectDir);
+                        expect(stubExec).to.have.been.calledWith("git clone https://github.com/raappid/template-basic.git", tempProjectDir);
                     });
 
                     ps.downloadTemplate("template",tempProjectDir,"").then(()=>{
 
-                        expect(stubExec).to.have.been.calledWith("npm install raappid/template-basic", tempProjectDir);
+                        expect(stubExec).to.have.been.calledWith("git clone https://github.com/raappid/template-basic.git", tempProjectDir);
                         done();
                     });
 
@@ -136,7 +136,29 @@ describe('project-service Test cases', () => {
 
             ps.downloadTemplate("template",tempProjectDir,"raappid/sdfsgdg").then((result)=>{
 
-                expect(stubExec).to.have.been.calledWith("npm install raappid/sdfsgdg", tempProjectDir);
+                expect(stubExec).to.have.been.calledWith("git clone https://github.com/raappid/sdfsgdg.git", tempProjectDir);
+                done();
+            });
+
+
+        });
+
+        it('should download from bitbucket remote template ', (done)=> {
+
+            ps.downloadTemplate("template",tempProjectDir,"bitbucket:raappid/sdfsgdg").then((result)=>{
+
+                expect(stubExec).to.have.been.calledWith("git clone https://raappid@bitbucket.org/raappid/sdfsgdg.git", tempProjectDir);
+                done();
+            });
+
+
+        });
+
+        it('should download from git lab remote template ', (done)=> {
+
+            ps.downloadTemplate("template",tempProjectDir,"gitlab:raappid/sdfsgdg").then((result)=>{
+
+                expect(stubExec).to.have.been.calledWith("git clone https://gitlab.com/raappid/sdfsgdg.git", tempProjectDir);
                 done();
             });
 
