@@ -71,7 +71,6 @@ raappid [project-type] <<project-name>> --using <<template-name>>
                    project type will be used to create the project.
 
                    Examples:
-                   npm-package-name
                    githubname/reponame
                    bitbucket:mybitbucketuser/myproject
                    gitlab:mygitlabuser/myproject
