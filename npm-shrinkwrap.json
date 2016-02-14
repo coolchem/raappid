@@ -191,6 +191,18 @@
       "from": "create-thenable@>=1.0.0 <1.1.0",
       "resolved": "https://registry.npmjs.org/create-thenable/-/create-thenable-1.0.1.tgz"
     },
+    "cross-spawn-async": {
+      "version": "2.1.6",
+      "from": "cross-spawn-async@>=2.1.6 <3.0.0",
+      "resolved": "https://registry.npmjs.org/cross-spawn-async/-/cross-spawn-async-2.1.6.tgz",
+      "dependencies": {
+        "lru-cache": {
+          "version": "4.0.0",
+          "from": "lru-cache@>=4.0.0 <5.0.0",
+          "resolved": "https://registry.npmjs.org/lru-cache/-/lru-cache-4.0.0.tgz"
+        }
+      }
+    },
     "cryptiles": {
       "version": "2.0.5",
       "from": "cryptiles@>=2.0.0 <3.0.0",
@@ -980,6 +992,11 @@
       "from": "process-nextick-args@>=1.0.6 <1.1.0",
       "resolved": "https://registry.npmjs.org/process-nextick-args/-/process-nextick-args-1.0.6.tgz"
     },
+    "pseudomap": {
+      "version": "1.0.2",
+      "from": "pseudomap@>=1.0.1 <2.0.0",
+      "resolved": "https://registry.npmjs.org/pseudomap/-/pseudomap-1.0.2.tgz"
+    },
     "qs": {
       "version": "5.2.0",
       "from": "qs@>=5.2.0 <5.3.0",
@@ -1331,6 +1348,11 @@
       "version": "4.0.1",
       "from": "xtend@>=4.0.0 <5.0.0",
       "resolved": "https://registry.npmjs.org/xtend/-/xtend-4.0.1.tgz"
+    },
+    "yallist": {
+      "version": "2.0.0",
+      "from": "yallist@>=2.0.0 <3.0.0",
+      "resolved": "https://registry.npmjs.org/yallist/-/yallist-2.0.0.tgz"
     },
     "yargs": {
       "version": "3.10.0",

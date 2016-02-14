@@ -35,23 +35,24 @@
     "which": "^1.2.0"
   },
   "devDependencies": {
-    "chai": "^3.4.0",
-    "coveralls": "^2.11.4",
-    "del": "^2.0.2",
-    "istanbul": "^0.4.0",
-    "mocha": "^2.3.3",
-    "mock-stdin": "^0.3.0",
-    "sinon": "^1.17.2",
-    "sinon-as-promised": "^4.0.0",
-    "sinon-chai": "^2.8.0",
-    "tsd": "^0.6.5",
-    "typescript": "^1.7"
+    "chai": "3.4.0",
+    "coveralls": "2.11.4",
+    "del": "2.0.2",
+    "istanbul": "0.4.0",
+    "mocha": "2.3.3",
+    "mock-stdin": "0.3.0",
+    "sinon": "1.17.2",
+    "sinon-as-promised": "4.0.0",
+    "sinon-chai": "2.8.0",
+    "tsd": "0.6.5",
+    "typescript": "1.7"
   },
   "bin": {
     "raappid": "dist/bin/raappid.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "npm-shrinkwrap.json"
   ],
   "scripts": {
     "install-other-dependencies": "node scripts/install-other-dependencies.js",
