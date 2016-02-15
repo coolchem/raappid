@@ -390,26 +390,6 @@ describe('project-assistant Test cases', () => {
             });
         });
 
-        it("should do shrinkwrap",(done)=>{
-
-            pa.initializeProject("test","testDirectory").then(()=>{
-
-                expect(shrinkWrapStub).to.have.been.calledWith("testDirectory").calledOnce;
-                done();
-            });
-        });
-
-
-        it("should reject with error if any issue with shrinkwrapping",(done)=>{
-
-            shrinkWrapStub.rejects(new Error("yay"));
-            pa.initializeProject("test","testDirectory").then(null,(error)=>{
-                expect(error).to.be.instanceOf(Error);
-                expect(error.message).to.equal("yay");
-                done()
-            });
-        });
-
 
     });
 });

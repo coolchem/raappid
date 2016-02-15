@@ -26,13 +26,13 @@
     "development"
   ],
   "dependencies": {
-    "chalk": "^1.1.1",
-    "cross-spawn-async": "^2.1.6",
-    "fs-extra": "^0.26.2",
-    "github": "^0.2.4",
-    "minimist": "^1.2.0",
-    "read": "^1.0.7",
-    "which": "^1.2.0"
+    "chalk": "1.1.1",
+    "cross-spawn-async": "2.1.6",
+    "fs-extra": "0.26.2",
+    "github": "0.2.4",
+    "minimist": "1.2.0",
+    "read": "1.0.7",
+    "which": "1.2.0"
   },
   "devDependencies": {
     "chai": "3.4.0",
