@@ -51,8 +51,7 @@
     "raappid": "dist/bin/raappid.js"
   },
   "files": [
-    "dist",
-    "npm-shrinkwrap.json"
+    "dist"
   ],
   "scripts": {
     "install-other-dependencies": "node scripts/install-other-dependencies.js",
