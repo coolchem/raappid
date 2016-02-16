@@ -30,6 +30,8 @@ describe('project-service Test cases', () => {
 
             expect(ps.validateProjectType("node-app")).to.be.true;
             expect(ps.validateProjectType("web-app")).to.be.true;
+            expect(ps.validateProjectType("node-module")).to.be.true;
+            expect(ps.validateProjectType("browser-module")).to.be.true;
             expect(ps.validateProjectType("template")).to.be.true;
             expect(ps.validateProjectType("basic")).to.be.true;
             done();
@@ -112,17 +114,20 @@ describe('project-service Test cases', () => {
 
                     expect(stubExec).to.have.been.calledWith("git clone https://github.com/raappid/template-web-app-basic.git", tempProjectDir);
 
-
-
-                    ps.downloadTemplate("template",tempProjectDir).then(()=>{
-
-                        expect(stubExec).to.have.been.calledWith("git clone https://github.com/raappid/template-basic.git", tempProjectDir);
-                    });
-
                     ps.downloadTemplate("template",tempProjectDir,"").then(()=>{
 
                         expect(stubExec).to.have.been.calledWith("git clone https://github.com/raappid/template-basic.git", tempProjectDir);
-                        done();
+
+                        ps.downloadTemplate("node-module",tempProjectDir,"").then(()=>{
+
+                            expect(stubExec).to.have.been.calledWith("git clone https://github.com/raappid/template-node-module-basic.git", tempProjectDir);
+
+                            ps.downloadTemplate("browser-module",tempProjectDir,"").then(()=>{
+
+                                expect(stubExec).to.have.been.calledWith("git clone https://github.com/raappid/template-browser-module-basic.git", tempProjectDir);
+                                done();
+                            });
+                        });
                     });
 
                 });

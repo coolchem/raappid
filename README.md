@@ -44,11 +44,13 @@ raappid [project-type] <<project-name>> --using <<template-name>>
 1. Choose your project type (**required**)
 
     ````
-    project-type: node-app | web-app | template
+    project-type: node-app | web-app | node-module | browser-module | template
     ````
 
     - **node-app**: Choose this project type, when you want to create nodejs modules or applications.
     - **web-app**:  Choose this project type, when you want to create web applications.
+    - **node-module**:  Choose this project type, when you want to create module to be used in nodejs apps and is published on npm.
+    - **browser-module**:  Choose this project type, when you want to create module to be used in browser and is published on npm.
     - **template**: Choose this project type, if you want to develop a template for your projects or to share with other developers.
 
 

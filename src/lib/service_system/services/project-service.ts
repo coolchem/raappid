@@ -7,13 +7,20 @@ import path = require('path');
 var PROJECT_TYPE_BASIC:string = "basic";
 var PROJECT_TYPE_NODE:string = "node-app";
 var PROJECT_TYPE_WEB:string = "web-app";
+var PROJECT_TYPE_NODE_MODULE:string = "node-module";
+var PROJECT_TYPE_BROWSER_MODULE:string = "browser-module";
 var PROJECT_TYPE_TEMPLATE:string = "template";
 
 
 export function validateProjectType(type:string):boolean
 {
 
-    return type == PROJECT_TYPE_NODE ||  type == PROJECT_TYPE_WEB || type == PROJECT_TYPE_TEMPLATE || type == PROJECT_TYPE_BASIC;
+    return type == PROJECT_TYPE_NODE
+        || type == PROJECT_TYPE_WEB
+        || type == PROJECT_TYPE_TEMPLATE
+        || type == PROJECT_TYPE_BASIC
+        || type == PROJECT_TYPE_NODE_MODULE
+        || type == PROJECT_TYPE_BROWSER_MODULE
 }
 
 export function validateProjectName(name:string):boolean
@@ -42,6 +49,12 @@ export function downloadTemplate(projectType:string,projectDirectoryPath:string,
                 break;
             case PROJECT_TYPE_WEB:
                 templateName ="raappid/template-web-app-basic";
+                break;
+            case PROJECT_TYPE_NODE_MODULE:
+                templateName ="raappid/template-node-module-basic";
+                break;
+            case PROJECT_TYPE_BROWSER_MODULE:
+                templateName ="raappid/template-browser-module-basic";
                 break;
             case PROJECT_TYPE_TEMPLATE:
                 templateName ="raappid/template-basic";

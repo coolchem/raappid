@@ -10,7 +10,7 @@ export const CLI_HELP_TEXT:string =
 
          Options:
 
-         project-type: node-app | web-app | template
+         project-type: node-app | web-app | node-module | browser-module | template
 
          project-name: it is the name you want to give to your project,
                        a folder with your project name will be created in the directory
