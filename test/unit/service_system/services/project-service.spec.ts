@@ -139,7 +139,7 @@ describe('project-service Test cases', () => {
 
         it('should download from remote template ', (done)=> {
 
-            ps.downloadTemplate("template",tempProjectDir,"raappid/sdfsgdg").then((result)=>{
+            ps.downloadTemplate("create",tempProjectDir,"raappid/sdfsgdg").then((result)=>{
 
                 expect(stubExec).to.have.been.calledWith("git clone https://github.com/raappid/sdfsgdg.git", tempProjectDir);
                 done();
@@ -150,7 +150,7 @@ describe('project-service Test cases', () => {
 
         it('should download from bitbucket remote template ', (done)=> {
 
-            ps.downloadTemplate("template",tempProjectDir,"bitbucket:raappid/sdfsgdg").then((result)=>{
+            ps.downloadTemplate("create",tempProjectDir,"bitbucket:raappid/sdfsgdg").then((result)=>{
 
                 expect(stubExec).to.have.been.calledWith("git clone https://raappid@bitbucket.org/raappid/sdfsgdg.git", tempProjectDir);
                 done();
@@ -161,7 +161,7 @@ describe('project-service Test cases', () => {
 
         it('should download from git lab remote template ', (done)=> {
 
-            ps.downloadTemplate("template",tempProjectDir,"gitlab:raappid/sdfsgdg").then((result)=>{
+            ps.downloadTemplate("create",tempProjectDir,"gitlab:raappid/sdfsgdg").then((result)=>{
 
                 expect(stubExec).to.have.been.calledWith("git clone https://gitlab.com/raappid/sdfsgdg.git", tempProjectDir);
                 done();
@@ -173,7 +173,7 @@ describe('project-service Test cases', () => {
         it('should reject with error if there was issue with downloading remote template', (done)=> {
 
             stubExec.rejects(new Error("yay"));
-            ps.downloadTemplate("template",tempProjectDir,"raappid/sdfsgdg").then(null,(error)=>{
+            ps.downloadTemplate("create",tempProjectDir,"raappid/sdfsgdg").then(null,(error)=>{
 
                 expect(error).to.be.instanceOf(Error);
                 expect(error.message).to.equal("yay");

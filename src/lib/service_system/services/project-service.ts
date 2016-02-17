@@ -35,31 +35,26 @@ export function downloadTemplate(projectType:string,projectDirectoryPath:string,
 
     var cmd:string = "git clone ";
 
-    if(projectType == PROJECT_TYPE_BASIC)
+    switch (projectType)
     {
-        templateName = "raappid/template-basic"
-    }
-
-    if(templateName == "")
-    {
-        switch (projectType)
-        {
-            case PROJECT_TYPE_NODE:
-                templateName ="raappid/template-node-app-basic";
-                break;
-            case PROJECT_TYPE_WEB:
-                templateName ="raappid/template-web-app-basic";
-                break;
-            case PROJECT_TYPE_NODE_MODULE:
-                templateName ="raappid/template-node-module-basic";
-                break;
-            case PROJECT_TYPE_BROWSER_MODULE:
-                templateName ="raappid/template-browser-module-basic";
-                break;
-            case PROJECT_TYPE_TEMPLATE:
-                templateName ="raappid/template-basic";
-                break;
-        }
+        case PROJECT_TYPE_BASIC:
+            templateName ="raappid/template-basic";
+            break;
+        case PROJECT_TYPE_NODE:
+            templateName ="raappid/template-node-app-basic";
+            break;
+        case PROJECT_TYPE_WEB:
+            templateName ="raappid/template-web-app-basic";
+            break;
+        case PROJECT_TYPE_NODE_MODULE:
+            templateName ="raappid/template-node-module-basic";
+            break;
+        case PROJECT_TYPE_BROWSER_MODULE:
+            templateName ="raappid/template-browser-module-basic";
+            break;
+        case PROJECT_TYPE_TEMPLATE:
+            templateName ="raappid/template-basic";
+            break;
     }
 
     var names:string[] = templateName.split(":");
