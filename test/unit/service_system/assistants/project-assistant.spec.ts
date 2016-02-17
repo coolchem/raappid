@@ -350,18 +350,22 @@ describe('project-assistant Test cases', () => {
 
         var sanitizeStub:any;
         var instalDepsStup:any;
+        var doAdditionalSetupStub:any;
 
         beforeEach(()=>{
             sanitizeStub = sinon.stub(ps,"sanitizePackage");
             instalDepsStup = sinon.stub(ps,"installDependencies");
+            doAdditionalSetupStub = sinon.stub(ps,"doAdditionalSetup");
 
             sanitizeStub.returns({});
             instalDepsStup.resolves(true);
+            doAdditionalSetupStub.resolves(true);
         });
 
         afterEach(()=>{
             sanitizeStub.restore();
             instalDepsStup.restore();
+            doAdditionalSetupStub.restore();
         });
 
         it("should sanitize the package.json",(done)=>{
@@ -380,6 +384,15 @@ describe('project-assistant Test cases', () => {
             pa.initializeProject("test","testDirectory").then(()=>{
 
                 expect(instalDepsStup).to.have.been.calledWith("testDirectory").calledOnce;
+                done();
+            });
+        });
+
+        it("should do additional setup",(done)=>{
+
+            pa.initializeProject("test","testDirectory").then(()=>{
+
+                expect(doAdditionalSetupStub).to.have.been.calledWith("testDirectory").calledOnce;
                 done();
             });
         });

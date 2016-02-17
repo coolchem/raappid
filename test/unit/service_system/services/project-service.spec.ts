@@ -290,6 +290,80 @@ describe('project-service Test cases', () => {
 
     });
 
+    describe('doAdditionalSetup', () => {
+
+
+        var tempProjectDir:string = path.resolve("./test/tempProject");
+        var stubExec:any;
+        beforeEach((done)=>{
+
+            stubExec = sinon.stub(shell,"exec");
+            fs.mkdirs(tempProjectDir, function (err) {
+                fs.writeFileSync(tempProjectDir+"/package.json",JSON.stringify({version:"0.0.1"}, null, '  ') + '\n');
+                fs.mkdirsSync(tempProjectDir+"/scripts");
+                done();
+            })
+
+        });
+
+        afterEach(()=>{
+            fs.removeSync(tempProjectDir);
+
+            if(stubExec.restore)
+                stubExec.restore();
+        });
+
+        it('should run the additional-setup.js if it is present in the scripts folder', function(done) {
+
+            fs.writeFileSync(tempProjectDir +"/scripts/additional-setup.js",
+                `
+                 console.log('yay')
+                `);
+            stubExec.resolves(true);
+            ps.doAdditionalSetup(tempProjectDir).then((result)=> {
+
+
+                expect(stubExec).to.have.been.calledWith("node " + tempProjectDir + "/scripts/additional-setup.js", tempProjectDir);
+                done();
+            });
+
+        });
+
+        it('should resolve to true if additional-setup.js was not found', function(done) {
+
+            stubExec.resolves(true);
+
+            ps.doAdditionalSetup(tempProjectDir).then((result)=>{
+                expect(result).to.be.true;
+                done();
+
+            },(error)=>{
+                done("Should not have been rejected\n");
+            });
+        });
+
+        it('should reject with error if additional-setup.js script has error', function(done) {
+
+            stubExec.onCall(0).rejects(new Error("humm"));
+
+            fs.writeFileSync(tempProjectDir +"/scripts/additional-setup.js",
+                `
+                 console.log('yay')
+                `);
+
+            ps.doAdditionalSetup(tempProjectDir).then((result)=>{
+                done("Should never have passed\n");
+
+            },(error)=>{
+
+                expect(error).to.be.instanceOf(Error);
+                expect(error.message).to.equal("humm");
+                done();
+            });
+        });
+
+
+    });
 
 
 });

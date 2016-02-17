@@ -292,5 +292,7 @@ export function initializeProject(projectName:string,projectDirectory:string):Pr
 
     ps.sanitizePackage(projectName,projectDirectory);
 
-    return ps.installDependencies(projectDirectory)
+    return ps.installDependencies(projectDirectory).then(()=>{
+        return ps.doAdditionalSetup(projectDirectory)
+    })
 }

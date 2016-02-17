@@ -102,6 +102,31 @@ export function downloadTemplate(projectType:string,projectDirectoryPath:string,
 
 }
 
+export function doAdditionalSetup(projectDirectoryPath:string):Promise<boolean>
+{
+
+    return new Promise((resolve,reject)=>{
+
+        try {
+            fs.lstatSync(projectDirectoryPath+"/scripts/additional-setup.js");
+
+            var cmd = "node " + projectDirectoryPath+ "/scripts/additional-setup.js";
+
+            shell.exec(cmd,projectDirectoryPath).then((result)=>{
+                resolve(result);
+            },(error)=>{
+                reject(error);
+            })
+        }
+        catch (e)
+        {
+            resolve(true);
+        }
+    });
+
+
+}
+
 export function installDependencies(projectDirectoryPath:string):Promise<boolean>
 {
 
