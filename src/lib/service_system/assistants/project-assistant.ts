@@ -23,6 +23,9 @@ export const ERROR_INVALID_PROJECT_NAME:string =
 
 export const ERROR_INVALID_PROJECT_TYPE:string = "Error Project type invalid: Please provide from these options, node-app | web-app | template";
 
+export const ERROR_INVALID_TEMPLATE_NAME:string = "Template name is required to create the project.";
+
+
 export const ERROR_CREATING_REPO_BAD_CREDENTIALS:string =`Error Creating #repo-type repository: Your username or password is in valid`;
 
 export const MESSAGE_CREATE_REMOTE_REPO:string = "Would like to create a #repo-type repository for your project?";
@@ -86,7 +89,7 @@ function askToEnterNewRepoName(repoName:string):Promise<string>
     return cliService.askInput("Enter New Repository Name");
 }
 
-export function validate(projectType:string,projectName:string):Promise<boolean>
+export function validate(mainCommand:string,projectName:string,templateName?:string):Promise<boolean>
 {
 
     return new Promise((resolve,reject)=>{
@@ -96,10 +99,20 @@ export function validate(projectType:string,projectName:string):Promise<boolean>
             throw new Error(ERROR_GIT_NOT_INSTALLED);
         }
 
-        if(!ps.validateProjectType(projectType))
+        if(mainCommand !== "create")
         {
-            throw new Error(ERROR_INVALID_PROJECT_TYPE);
+            if(!ps.validateProjectType(mainCommand))
+            {
+                throw new Error(ERROR_INVALID_PROJECT_TYPE);
 
+            }
+        }
+        else
+        {
+            if(!templateName || templateName === "")
+            {
+               throw new Error(ERROR_INVALID_TEMPLATE_NAME);
+            }
         }
 
         if(!ps.validateProjectName(projectName))

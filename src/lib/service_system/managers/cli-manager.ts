@@ -6,7 +6,15 @@ export const CLI_HELP_TEXT:string =
 
          raappid -v or  --version  ( gives the version of raappid application)
 
-         raappid [project-type] <<project-name>> --using <<template-name>>
+         Main command:
+
+         raappid create <<project-name>> --using <<template-name>>
+                                    or
+         raappid create <<project-name>> -u <<template-name>>
+
+         Shortcut command:
+
+         raappid [project-type] <<project-name>>
 
          Options:
 
@@ -21,8 +29,6 @@ export const CLI_HELP_TEXT:string =
 
          template-name: template name refers to the remote repository from which
                         the project will be based on.
-                        If no template name is provided, a default template for
-                        project type will be used to create the project.
 
                         Examples:
                         githubname/reponame
@@ -31,12 +37,14 @@ export const CLI_HELP_TEXT:string =
 
          Sample Commands:
 
+         raappid create myTestProject --using raappid/template-node-app-basic
+         raappid create myTestProject -u raappid/template-node-app-basic
          raappid web-app myTestProject
-         raappid node-app myTestProject --using coolchem/node-cli-basic
+         raappid node-app myTestProject
 
          `;
 
-export const ERROR_ARGUMENTS_MISMATCH:string = "Error arguments mismatch: Both Project type and Project name must be provided";
+export const ERROR_ARGUMENTS_MISMATCH:string = "Error arguments mismatch: please make sure the command entered is correct";
 
 export const ERROR_INVALID_PROJECT_NAME:string =
     `Error Project name is invalid : Please make sure there are no spaces or invalid characters in the project name.
@@ -47,7 +55,7 @@ export const ERROR_INVALID_PROJECT_NAME:string =
          Some valid project name examples:
          my-project, my_project, MyProject or myproject`;
 
-export function processArguments(argv:any):{projectType:string,
+export function processArguments(argv:any):{mainCommand:string,
     projectName:string,templateName:string}{
 
     var error:Error;
@@ -78,16 +86,20 @@ export function processArguments(argv:any):{projectType:string,
         throw error;
     }
 
-    var projectType:string = commands[0];
+    var mainCommand:string = commands[0];
     var projectName:string = commands[1];
     var templateName:string = "";
 
-    if(argv.hasOwnProperty("using") && typeof argv.using == "string")
+    if((argv.hasOwnProperty("using") && typeof argv.using == "string"))
     {
         templateName = argv.using;
     }
+    else if(argv.hasOwnProperty("u") && typeof argv.u == "string")
+    {
+        templateName = argv.u;
+    }
 
 
-    return {projectType:projectType,projectName:projectName,templateName:templateName};
+    return {mainCommand:mainCommand,projectName:projectName,templateName:templateName};
 
 }

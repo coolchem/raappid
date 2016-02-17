@@ -14,7 +14,7 @@ process.env.INIT_CWD = process.cwd();
 actionControl.perform(Action.PROCESS_ARGUMENTS,argv)
     .then((result)=>{
 
-       actionControl.perform(Action.CREATE_PROJECT_CLI,result.projectType,result.projectName,result.templateName)
+       actionControl.perform(Action.CREATE_PROJECT_CLI,result.mainCommand,result.projectName,result.templateName)
         .then(()=>{
             process.exit(0);
 

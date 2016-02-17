@@ -49,6 +49,15 @@ describe('project-assistant Test cases', () => {
             });
         });
 
+        it('should reject with error main command is create and no template is provided', function(done) {
+
+            pa.validate("create","asdad").catch((error)=>{
+                expect(error).to.be.instanceOf(Error);
+                expect(error.message).to.equal(pa.ERROR_INVALID_TEMPLATE_NAME);
+                done();
+            });
+        });
+
         it('should reject with error if not valid project name', function(done) {
 
             pa.validate("node-app","as?ad").catch((error)=>{

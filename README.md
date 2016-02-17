@@ -36,44 +36,60 @@ user defined templates to scaffold your project.
 ##### Command
 
 ````
-raappid [project-type] <<project-name>> --using <<template-name>>
+    raappid create <<project-name>> --using <<template-name>>
+                            or
+    raappid create <<project-name>> -u <<template-name>>
 ````
 
 
 
-1. Choose your project type (**required**)
+1. Choose name for your project (**required**)
 
-    ````
-    project-type: node-app | web-app | node-module | browser-module | template
-    ````
-
-    - **node-app**: Choose this project type, when you want to create nodejs modules or applications.
-    - **web-app**:  Choose this project type, when you want to create web applications.
-    - **node-module**:  Choose this project type, when you want to create module to be used in nodejs apps and is published on npm.
-    - **browser-module**:  Choose this project type, when you want to create module to be used in browser and is published on npm.
-    - **template**: Choose this project type, if you want to develop a template for your projects or to share with other developers.
-
-
-2. Choose name for your project (**required**)
-    ````
+````
     project-name: it is the name you want to give to your project,
                   a folder with your project name will be created in the directory
                   where the command is run
 
                   Requirements: name should be single word for example,
                   my-project, my_project, MyProject or myproject etc.
-    ````
+````
 
-3. Choose a template (**optional**)
+2. Choose a template (**required**)
 
     ````
     template-name: template name refers to the remote repository from which
-                   the project will be based on.
-                   If no template name is provided, a default template for the
-                   project type will be used to create the project.
+                   the project will be based on
 
                    Examples:
                    githubname/reponame
                    bitbucket:mybitbucketuser/myproject
                    gitlab:mygitlabuser/myproject
     ````
+
+##### Shortcut Command
+
+This command sets up project from basic templates, for the most common type of projects
+
+````
+    raappid <<project-type>> <<project-name>>  
+
+
+    The above command is just an alias to main command, for example, for a project type "node-module"
+    the shortcut command would be
+
+    "raappid node-module testProject"
+
+    its Alias:
+
+    raappid create testProject --using raappid/template-node-module-basic
+````
+ 
+The project types supported in the shortcut command as as below:    
+    
+- **node-app**: Choose this project type, when you want to create nodejs modules or applications.
+- **web-app**:  Choose this project type, when you want to create web applications.
+- **node-module**:  Choose this project type, when you want to create module to be used in nodejs apps and is published on npm.
+- **browser-module**:  Choose this project type, when you want to create module to be used in browser and is published on npm.
+- **template**: Choose this project type, if you want to develop a template for your projects or to share with other developers.
+
+    

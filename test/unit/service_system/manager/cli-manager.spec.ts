@@ -46,7 +46,13 @@ describe('cli-manager Test cases', () => {
             var result = cm.processArguments({_:["asdad","asdsad"],using:"sdfsfsf"});
 
             expect(result.projectName).to.equal("asdsad");
-            expect(result.projectType).to.equal("asdad");
+            expect(result.mainCommand).to.equal("asdad");
+            expect(result.templateName).to.equal("sdfsfsf");
+
+            var result1 = cm.processArguments({_:["asdad","asdsad"],u:"sdfsfsf"});
+
+            expect(result.projectName).to.equal("asdsad");
+            expect(result.mainCommand).to.equal("asdad");
             expect(result.templateName).to.equal("sdfsfsf");
         });
 
@@ -55,7 +61,7 @@ describe('cli-manager Test cases', () => {
             var result = cm.processArguments({_:["asdad","asdsad"]});
 
             expect(result.projectName).to.equal("asdsad");
-            expect(result.projectType).to.equal("asdad");
+            expect(result.mainCommand).to.equal("asdad");
             expect(result.templateName).to.equal("");
         });
 

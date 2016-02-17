@@ -60,7 +60,7 @@ function confirmCreatingRemoteRepo(resolve,projectName:string,projectDirectory:s
 }
 
 //todo: an effective refactor of the monstrosity below
-export function createProjectCLI(projectType:string,projectName:string,templateName?:string):Promise<string[]>{
+export function createProjectCLI(mainCommand:string,projectName:string,templateName?:string):Promise<string[]>{
 
 
     return new Promise((resolve,reject)=>{
@@ -71,7 +71,7 @@ export function createProjectCLI(projectType:string,projectName:string,templateN
 
         logStep("Validating...");
 
-        pa.validate(projectType,projectName)
+        pa.validate(mainCommand,projectName,templateName)
             .then(()=>{
                 logStep("Validation Complete.",false);
 
@@ -85,7 +85,7 @@ export function createProjectCLI(projectType:string,projectName:string,templateN
 
                         projectDirectory= projectDirectoryPath;
 
-                        pa.copyTemplate(projectType,projectDirectory,templateName)
+                        pa.copyTemplate(mainCommand,projectDirectory,templateName)
                             .then(()=>{
 
                                 logStep("Copying template completed.",false);
