@@ -4,6 +4,8 @@ Project Scaffolding Tool
 
 [![Coverage Status](https://coveralls.io/repos/coolchem/raappid/badge.svg?branch=master&service=github)](https://coveralls.io/github/coolchem/raappid?branch=master)  [![Build Status](https://travis-ci.org/coolchem/raappid.svg?branch=master)](https://travis-ci.org/coolchem/raappid)
 
+Raappid is a Project Scaffolding tool. It is a Command line tool run in NodeJS. It is used to rapidly setup a development environment, for projects using either inbuilt or user defined templates.. 
+I started working on this project to save me some time in porting over my common project setup, like Continuous Integration, Unit testing, release and deploy settings. And quicly build and deploy production ready projects.
 
 ##### Things you must consider before using raappid
 
