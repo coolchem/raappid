@@ -4,6 +4,7 @@
 
 import pa = require("../assistants/project-assistant");
 import cliService = require("../services/cli-service");
+import repoService = require("../services/repo-service");
 import fs = require("fs-extra");
 
 function logStep(message:string,isStaring:boolean = true):string
@@ -20,6 +21,7 @@ function confirmCreatingRemoteRepo(resolve,projectName:string,projectDirectory:s
     pa.createRemoteRepository(projectName).then((result:{username:string,password:string,repoName:string})=>{
         if(!result)
         {
+            doLocalCommit();
             cliService.logSuccess("\nProject Created Successfully!!\n");
             resolve(summary);
         }
@@ -34,75 +36,87 @@ function confirmCreatingRemoteRepo(resolve,projectName:string,projectDirectory:s
                         cliService.logSuccess("\nProject Created Successfully!!\n");
                         resolve(summary);
 
-                    },(error)=>{
+                    },doCallBack)
 
-                        cliService.logError(error.message);
-                        cliService.logSuccess("\nProject Created Successfully!!\n");
-                        resolve(summary);
-
-                    })
-
-                },(error)=>{
-
-                    cliService.logError(error.message);
-                    cliService.logSuccess("\nProject Created Successfully!!\n");
-                    resolve(summary);
-
-                });
+                },doCallBack);
         }
-    },(error)=>{
 
-        cliService.logError(error.message);
-        cliService.logSuccess("\nProject Created Successfully!!\n");
-        resolve(summary);
+    },doCallBack);
 
-    })
+    function doLocalCommit(error?):void
+    {
+
+        if(error)
+            cliService.logError(error.message);
+
+        repoService.addAllFilesAndCommit("First Commit",projectDirectory)
+            .then(()=>{
+                resolve(summary);
+                cliService.logSuccess("\nProject Created Successfully!!\n");
+
+            },(error)=>{
+
+                cliService.logError(error.message);
+                cliService.logSuccess("\nProject Created Successfully!!\n");
+                resolve(summary);
+            })
+    }
+
+    function doCallBack(error):void
+    {
+        doLocalCommit(error);
+    }
 }
 
 //todo: an effective refactor of the monstrosity below
 export function createProjectCLI(mainCommand:string,projectName:string,templateName?:string):Promise<string[]>{
 
+    var projectDirectory:string;
+    var summary:string[] = [];
+
+    logStep("Validating...");
+
 
     return new Promise((resolve,reject)=>{
 
-
-        var projectDirectory:string;
-        var summary:string[] = [];
-
-        logStep("Validating...");
-
         pa.validate(mainCommand,projectName,templateName)
             .then(()=>{
+
+
                 logStep("Validation Complete.",false);
 
                 logStep("Creating project directory...");
 
-                pa.createProjectDirectory(projectName)
-                    .then((projectDirectoryPath)=>{
+                return pa.createProjectDirectory(projectName)
 
-                        logStep("Project directory created.",false);
-                        logStep("Copying template...");
 
-                        projectDirectory= projectDirectoryPath;
+            },doRejection).then((projectDirectoryPath)=>{
 
-                        pa.copyTemplate(mainCommand,projectDirectory,templateName)
-                            .then(()=>{
+            logStep("Project directory created.",false);
 
-                                logStep("Copying template completed.",false);
+            projectDirectory= projectDirectoryPath;
 
-                                logStep("Initializing project...");
+            logStep("Copying template...");
 
-                                pa.initializeProject(projectName,projectDirectory)
-                                    .then(()=>{
+            return pa.copyTemplate(mainCommand,projectDirectory,templateName);
 
-                                        logStep("Project initialized.",false);
-                                        confirmCreatingRemoteRepo(resolve,projectName,projectDirectory,summary);
-                                    },doRejection);
+        },doRejection).then(()=>{
 
-                            },doRejection);
-                    },doRejection);
-            },doRejection);
+            logStep("Copying template completed.",false);
 
+            logStep("Initializing project...");
+
+            return pa.initializeProject(projectName,projectDirectory);
+
+        },doRejection).then(()=>{
+
+            logStep("Project initialized.",false);
+            confirmCreatingRemoteRepo(resolve,projectName,projectDirectory,summary);
+            return summary;
+
+        },doRejection).then(()=>{
+            resolve(summary);
+        });
 
         function doRejection(error){
 
@@ -119,7 +133,6 @@ export function createProjectCLI(mainCommand:string,projectName:string,templateN
             cliService.logError(error.message);
             reject(error);
         }
-
     });
 
 }
