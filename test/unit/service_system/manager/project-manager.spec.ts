@@ -8,6 +8,7 @@ import fs = require("fs-extra");
 import pm = require("../../../../src/lib/service_system/managers/project-manager");
 import pa = require("../../../../src/lib/service_system/assistants/project-assistant");
 import cliService = require("../../../../src/lib/service_system/services/cli-service");
+import repoService = require("../../../../src/lib/service_system/services/repo-service");
 
 import SinonStub = Sinon.SinonStub;
 import SinonSpy = Sinon.SinonSpy;
@@ -33,6 +34,7 @@ describe('project-manager Test cases', () => {
         var confirmStub:any;
         var configureRemoteRepoStub:any;
         var commitAndPushToRemoteStub:any;
+        var addAllFilesAndCommitStub:any;
 
         beforeEach(()=>{
             validateStub= sinon.stub(pa,"validate");
@@ -52,6 +54,7 @@ describe('project-manager Test cases', () => {
             createRemoteRepositoryStub.resolves({username:"testUser",password:"testPassword",repoName:"testRepo"});
             configureRemoteRepoStub.resolves(true);
             commitAndPushToRemoteStub.resolves(true);
+            addAllFilesAndCommitStub = sinon.stub(repoService,"addAllFilesAndCommit")
 
         });
         afterEach(()=>{
@@ -63,6 +66,7 @@ describe('project-manager Test cases', () => {
             confirmStub.restore();
             configureRemoteRepoStub.restore();
             commitAndPushToRemoteStub.restore();
+            addAllFilesAndCommitStub.restore();
 
         });
 
@@ -157,11 +161,14 @@ describe('project-manager Test cases', () => {
 
         });
 
-        it("should resolve with summary, if user does not want to create remote repo",(done)=>{
+        it("should resolve commit to local git and resolve with summary, if user does not want to create remote repo",(done)=>{
 
             createRemoteRepositoryStub.resolves(false);
+            addAllFilesAndCommitStub.resolves(true);
+
             pm.createProjectCLI("test","testProject").then((result)=>{
 
+                expect(addAllFilesAndCommitStub).to.have.been.calledOnce;
                 expect(result).to.be.instanceOf(Array);
                 done();
             });
